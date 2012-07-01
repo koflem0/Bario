@@ -9,6 +9,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -1008,6 +1009,10 @@ public class Client2D {
 					updateAnimations(timePassed);
 				}
 					Graphics2D g = S.getGraphics();
+					
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+	                         RenderingHints.VALUE_ANTIALIAS_ON);
+					
 					draw(g);
 					g.dispose();
 					S.update();

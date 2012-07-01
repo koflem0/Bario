@@ -78,10 +78,18 @@ import javax.swing.ImageIcon;
 						break;
 					}
 				}
+				limitWalls();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
+		}
+		
+		public void limitWalls(){
+			walls.add(new Wall(-2,0,4,Ylimit));
+			walls.add(new Wall(Xlimit-2,0,4,Ylimit));
+			walls.add(new Wall(0,-2,Xlimit,4));
+			walls.add(new Wall(0,Ylimit-2, Xlimit,4));
 		}
 
 		public ArrayList<Ladder> getLadders() {
