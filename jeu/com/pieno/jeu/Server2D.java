@@ -475,6 +475,7 @@ public class Server2D {
 			character.inventory = (Inventory) input.readObject();
 			input.close();
 			character.loadStats();
+			character.setInvincible(1000);
 			return character;
 		} catch (IOException ex) {
 			ex.printStackTrace();

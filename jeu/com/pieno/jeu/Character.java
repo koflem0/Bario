@@ -268,7 +268,7 @@ public class Character {
 			if(respawnTimer <= 0) respawn();
 		}
 		
-		if(invincible){
+		if(invincible && !name.equals("cheat")){
 			invincibleTime -= timePassed;
 			if(invincibleTime <=0) invincible = false;
 		}
