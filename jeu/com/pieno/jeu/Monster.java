@@ -114,7 +114,7 @@ public class Monster {
 			break;
 		case MUSHY:
 			atk = 58;
-			def = 17;
+			def = 24;
 			mastery = 50;
 			spd = -0.27f;
 			maxLife = 131;
@@ -130,16 +130,17 @@ public class Monster {
 			height = 82;
 			break;
 		case MUSHETTE:
-			atk = 32;
-			def = 7;
-			mastery = 70;
-			spd = -0.47f;
-			maxLife = 42;
+			atk = 70;
+			def = 10;
+			mastery = 50;
+			spd = -0.37f;
+			maxLife = 240;
 			timer = 20000;
-			exp = 10;
-			lvl = 8;
-			avoid = 18;
-			dropchance = 7;
+			exp = 60;
+			lvl = 13;
+			avoid = 25;
+			rarechance = 11;
+			dropchance = 19;
 			dropamount = 1;
 			name = "Mushette";
 			width = 63;

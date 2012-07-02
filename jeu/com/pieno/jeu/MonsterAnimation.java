@@ -74,6 +74,14 @@ public class MonsterAnimation{
 			monstreG[8] = newImage("/mushjumpL8.png");
 			monstreG[9] = newImage("/mushjumpL9.png");
 			break;
+		case Monster.MUSHETTE:
+			monstreD[1] = newImage("/MUSHETTE1D.png");
+			monstreD[2] = newImage("/MUSHETTE2D.png");
+			monstreD[3] = newImage("/MUSHETTE3D.png");
+			monstreG[1] = newImage("/MUSHETTE1G.png");
+			monstreG[2] = newImage("/MUSHETTE2G.png");
+			monstreG[3] = newImage("/MUSHETTE3G.png");
+			break;
 		case Monster.BABYSPIDER:
 			monstreG[0] = newImage("/babyspider1G.png");
 			monstreG[1] = newImage("/babyspider2G.png");
