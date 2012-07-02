@@ -114,6 +114,7 @@ public class Client2D {
 						auth.pass = pass;
 						client.sendTCP(auth);
 					}
+					return;
 				}
 				
 				if(object instanceof Stats){
@@ -132,6 +133,12 @@ public class Client2D {
 				if(object instanceof Skills){
 					Skills msg = (Skills) object;
 					ui.setSkills(msg);
+					return;
+				}
+				
+				if (object instanceof UpdateSkill) {
+					UpdateSkill msg = (UpdateSkill) object;
+					ui.updateSkill(msg);
 					return;
 				}
 				
@@ -501,6 +508,10 @@ public class Client2D {
 			} catch (Exception e) {}
 		}
 		
+		public void updateSkill(UpdateSkill update){
+			CharacterAnimation character = characters.get(update.id);
+			character.setSkill(update.skill, update.facingLeft);
+		}
 		
 		public void setStats(Stats stats){
 			currentChar.baseAtts = stats.atts;
@@ -595,7 +606,9 @@ public class Client2D {
 			character.maxMana = msg.maxMana;
 			character.lastUpdate = 0;
 			character.invincible = msg.invincible;
-			character.facingLeft = msg.facingLeft;
+			if(!msg.usingSkill)
+				character.setSkill(-1, true);
+			
 			if(character.currentAnim != msg.currentAnim){
 				switch(character.classe)
 				{
@@ -610,35 +623,6 @@ public class Client2D {
 					case Network.jumpR :character.setAnimation(charAnims[Network.wizjumpR], msg.currentAnim); break;
 				}
 				}
-			}
-			if(character.currentSkill!=msg.currentSkill){
-				character.currentSkill = msg.currentSkill;
-				int skill = -1;
-				if(msg.currentSkill!=-1)
-					switch(character.classe){
-					case Character.MAGE:
-						switch(msg.currentSkill){
-						case 0: skill = Skill.EnergyBall; break;
-						case 1: skill = Skill.FireBall; break;
-						case 2: skill = Skill.Explosion; break;
-						}
-					break;
-					case Character.ARCHER:
-						switch(msg.currentSkill){
-						case 0: skill = Skill.Arrow; break;
-						case 1: skill = Skill.DoubleArrow; break;
-						case 2: skill = Skill.ExplosiveArrow; break;
-						}
-					break;
-					case Character.FIGHTER:
-						switch(msg.currentSkill){
-						case 0: skill = Skill.ATTACK; break;
-						case 1: skill = Skill.MultiHit; break;
-						case 2: skill = Skill.Smash; break;
-						}
-					break;
-					}
-				character.setSkill(skill);
 			}
 			if(currentChar != null && msg.id == currentChar.id) {
 				currentChar.x = msg.x;

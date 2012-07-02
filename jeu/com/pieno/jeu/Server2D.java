@@ -582,9 +582,9 @@ public class Server2D {
 				update.maxLife = c.maxLife;
 				update.mana = c.mana;
 				update.maxMana = c.maxMana;
-				update.currentSkill = c.currentSkill;
 				update.invincible = c.invincible;
-				update.facingLeft = c.facingLeft;
+				if(c.currentSkill == -1)
+					update.usingSkill = false;
 				//Animation
 				if(c.onLadder != null) {
 					if(c.vy==0 && c.vx ==0)update.currentAnim = Network.onladder;
@@ -602,6 +602,7 @@ public class Server2D {
 					}
 				}
 				sendToAllOnMap(c.map, update, true);
+				
 			}
 		}
 	}
@@ -1488,6 +1489,11 @@ public class Server2D {
 					active = true;
 	
 					skillEffects();
+					UpdateSkill update = new UpdateSkill();
+					update.skill = this.skill;
+					update.id = c.id;
+					update.facingLeft = cLeft;
+					sendToAllOnMap(c.map, update, false);
 			} else {
 				c.setSkill(0);
 			}

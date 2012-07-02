@@ -65,6 +65,7 @@ public class Network {
 		kryo.register(RequestStats.class);
 		kryo.register(AddExp.class);
 		kryo.register(ChangedMap.class);
+		kryo.register(UpdateSkill.class);
 	}
 	
 	static public class ChangedMap{
@@ -167,6 +168,11 @@ public class Network {
 	static public class RemoveDrop {
 		public int id;
 	}
+	
+	static public class UpdateSkill {
+		public int skill, id;
+		public boolean facingLeft;
+	}
 
 	static public class AddProjectile {
 		public int id,x,y,type;
@@ -182,8 +188,8 @@ public class Network {
 	}
 	
 	static public class UpdateCharacter {
-		public int id, x, y, life, maxLife, mana, maxMana, currentSkill, currentAnim;
-		public boolean facingLeft, invincible;
+		public int id, x, y, life, maxLife, mana, maxMana, currentAnim;
+		public boolean invincible, usingSkill = true;
 	}
 
 	static public class AddCharacter {

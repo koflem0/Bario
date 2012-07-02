@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 public class CharacterAnimation {
 	String name, map;
 	int x, y, classe, life = 1, maxLife = 1, mana = 1, maxMana = 1, blinkCount = 0, currentSkill = -1, skillx=0, skilly=0, lastUpdate = 0, currentAnim = 0;
-	boolean facingLeft = false, invincible = false, blink = false, alive = true;
+	boolean invincible = false, blink = false, alive = true;
 	Animation skillAnimation, a;
 	
 	public CharacterAnimation(){
@@ -47,7 +47,7 @@ public class CharacterAnimation {
 		return getAnimation().getImage().getHeight(null);
 	}
 	
-	public void setSkill(int skill)
+	public void setSkill(int skill, boolean facingLeft)
 	{
 		Animation a = new Animation();
 		Image[] attackL = new Image[10], attackR = new Image[10];
@@ -149,6 +149,7 @@ public class CharacterAnimation {
 		if(a!=null)
 		a.start();
 		skillAnimation = a;
+		currentSkill = skill;
 	}
 	
 	public void setAnimation(Animation a, int animation){
