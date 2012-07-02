@@ -1515,6 +1515,7 @@ public class Client2D {
 			g.fillRoundRect(100, S.getHeight() - 50, 400, 20,10,10);
 			g.fillRoundRect(100, S.getHeight() - 25, 400, 20,10,10);
 			g.setColor(Color.GREEN);
+			if(currentChar==null)return;
 			g.fillRoundRect(100, S.getHeight() - 50,400*currentChar.life/currentChar.maxLife, 20,10,10);
 			if (currentChar.classe == Character.MAGE)
 				g.setColor(Color.BLUE);
@@ -1525,6 +1526,7 @@ public class Client2D {
 			g.fillRoundRect(100, S.getHeight() - 25, 400*currentChar.mana/currentChar.maxMana, 20,10,10);
 			g.setColor(Color.WHITE);
 			g.setFont(new Font("Arial", Font.BOLD, 40));
+			if(currentChar==null)return;
 			g.drawString(Integer.toString(currentChar.lvl), 20, S.getHeight() - 10);
 			g.setFont(new Font("Arial", Font.PLAIN, 12));
 			g.drawString(

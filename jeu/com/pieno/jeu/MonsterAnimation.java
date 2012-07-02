@@ -162,6 +162,7 @@ public class MonsterAnimation{
 			hitRight.addScene(monstreD[0], 200);
 			break;
 		case Monster.MUSHY:
+		case Monster.MUSHETTE:
 			right.addScene(monstreD[1], 190);
 			right.addScene(monstreD[2], 90);
 			right.addScene(monstreD[3], 190);
