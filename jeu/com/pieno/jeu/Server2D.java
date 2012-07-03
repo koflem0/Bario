@@ -1000,7 +1000,7 @@ public class Server2D {
 			
 			if(canFall)c.fall(timePassed);
 			
-			if(c.moveKeys[Network.UP] && c.changedMap)
+			if(c.moveKeys[Network.UP] && c.changedMap && c.currentSkill == -1)
 			for(Spot spot: map.getSpots()){
 				if(spot.getArea().intersects(c.getArea())){
 					c.map = spot.getNextMap();
@@ -1605,15 +1605,15 @@ public class Server2D {
 
 		if(m.isAlive()){
 		boolean crit = false;
-		Random rand = new Random();
+		Random rand = new Random(System.currentTimeMillis());
 		if ((rand.nextInt(100)) < c.critChance)
 		{
 			dmg = dmg * (c.critDamage + 100) / 100;
 			crit = true;
 		}
 		
-		if(m.avoid+m.getLevel()-c.lvl-c.atts[Network.AGI]+4 > 0)
-		if(rand.nextInt(100) < m.avoid + m.getLevel()-c.lvl-c.atts[Network.AGI]+4) dmg = 0;
+		if(m.avoid+m.getLevel()-c.lvl-c.atts[Network.AGI] > 0)
+		if(rand.nextInt(100) < m.avoid + m.getLevel()-c.lvl-c.atts[Network.AGI]) dmg = 0;
 
 		if (dmg > 0)
 		{

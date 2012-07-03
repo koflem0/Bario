@@ -11,6 +11,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Window;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -37,8 +39,6 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Listener.ThreadedListener;
 import com.esotericsoftware.minlog.Log;
-import com.pieno.jeu.Network.Login;
-import com.pieno.jeu.Network.Lvlskill;
 import com.pieno.jeu.Server2D.PassiveSkill;
 import com.pieno.jeu.Server2D.Skill;
 import com.pieno.jeu.Network.*;
@@ -328,6 +328,7 @@ public class Client2D {
 		w.addKeyListener(listener);
 		w.addMouseListener(listener);
 		w.addMouseMotionListener(listener);
+		w.addFocusListener(listener);
 		w.setFocusTraversalKeysEnabled(false);
 		playing = true;
 		
@@ -654,7 +655,7 @@ public class Client2D {
 		new Client2D();
 	}
 	
-	public class EventHandler implements KeyListener, MouseListener, MouseMotionListener{
+	public class EventHandler implements KeyListener, MouseListener, MouseMotionListener, FocusListener{
 
 		@Override
 		public void keyPressed(KeyEvent e) {
@@ -971,6 +972,16 @@ public class Client2D {
 				
 				previousI = -1; previousJ = -1; dragging = false;
 			}
+		}
+
+		@Override
+		public void focusGained(FocusEvent e) {}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			moveKeys[Network.UP]=moveKeys[Network.DOWN]=moveKeys[Network.LEFT]=moveKeys[Network.RIGHT]=false;
+			currentSkillKey=-1;
+			sendKeys();
 		}
 		
 	}
