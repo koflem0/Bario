@@ -49,6 +49,7 @@ public class Client2D {
 	static String name, pass;
 	static int Y, X, previousI = -1, previousJ = -1, previousItemSlot, classe = -1;
 	static boolean dragging = false, chooseClass = false, authenticated = false;
+	static MenuBar menu;
 	static StatMenu statMenu;
 	static SkillMenu skillMenu;
 	static SaveMenu mainMenu;
@@ -74,6 +75,8 @@ public class Client2D {
 	int[] skillKeys = new int[3];
 	boolean[] moveKeys = new boolean[5];
 	int currentSkillKey = -1;
+	
+	public static final int NONE = 0, SKILL = 1, STAT = 2, INV = 3;
 	
 	protected static final DisplayMode[] modes = {
 		new DisplayMode(1280,960,32,60),
@@ -334,7 +337,7 @@ public class Client2D {
 		
 		initkeys();
 		loadpics();
-		
+		menu = new MenuBar();
 		statMenu = new StatMenu();
 		skillMenu = new SkillMenu();
 		
@@ -662,16 +665,10 @@ public class Client2D {
 			int key = e.getKeyCode();
 			if(key==KeyEvent.VK_ESCAPE) {
 				if(inGame){
-					if(currentChar.inventory.isOpen()) {
-						currentChar.inventory.toggle();
-						listener.generateTooltips();
-					} else if(statMenu.isOpen()){
-						statMenu.toggle();
-					}else if(skillMenu.isOpen()){
-						skillMenu.toggle();
-					} else backToMenu();
+					if(menu.currentMenu != NONE) menu.currentMenu = NONE;
+					else backToMenu();
 				} else stop();
-				}
+			}
 			if(inGame){
 				if(key==keys[Network.JUMP]) moveKeys[Network.JUMP] = true;
 				if(key==keys[Network.DOWN]) moveKeys[Network.DOWN] = true;
@@ -681,14 +678,14 @@ public class Client2D {
 				for(int i = 0; i < skillKeys.length; i++){
 					if(key==skillKeys[i]) currentSkillKey = i;
 				}
-				if(key==KeyEvent.VK_A) statMenu.toggle();
-				if(key==KeyEvent.VK_S) skillMenu.toggle();
+				if(key==KeyEvent.VK_A) if(menu.currentMenu == STAT) menu.currentMenu = NONE; else menu.currentMenu = STAT;
+				if(key==KeyEvent.VK_S) if(menu.currentMenu == SKILL) menu.currentMenu = NONE; else {menu.currentMenu = SKILL; skillMenu.refresh();}
 				if(key==KeyEvent.VK_X) client.sendTCP(new Pickup());
 				if(key==KeyEvent.VK_I) {
-					if(statMenu.isOpen())statMenu.toggle();
-					if(skillMenu.isOpen())skillMenu.toggle();
-					client.sendTCP(new RequestStats());
-					currentChar.inventory.toggle();
+					if(menu.currentMenu == INV) menu.currentMenu = NONE; else {
+						client.sendTCP(new RequestStats());
+						menu.currentMenu = INV;
+					}
 					listener.generateTooltips();
 				}
 				sendKeys();
@@ -717,7 +714,7 @@ public class Client2D {
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			if(!dragging && inGame)
-			if(currentChar.inventory.isOpen()){
+			if(menu.currentMenu == INV){
 				location = e.getLocationOnScreen();
 				for(int i = 0; i < 8; i++){
 					if(currentChar.inventory.equipSlot[i].getArea().contains(location) && currentChar.inventory.getEquip(i)!=null) {
@@ -764,7 +761,7 @@ public class Client2D {
 				boolean onItem = false;
 
 				Item item;
-				if (currentChar.inventory.isOpen())
+				if (menu.currentMenu == INV)
 				{
 					for (int i = 0; i < 8; i++)
 					{
@@ -878,7 +875,7 @@ public class Client2D {
 			location = e.getLocationOnScreen();
 			SwitchItems switchItems = null;
 			if(currentChar != null && !dragging)
-			if(currentChar.inventory.isOpen()){
+			if(menu.currentMenu == INV){
 				for(int i = 0; i < 8; i++){
 					if(currentChar.inventory.equipSlot[i].getArea().contains(location) && currentChar.inventory.getEquip(i)!=null){
 						switchItems = new SwitchItems();
@@ -913,16 +910,23 @@ public class Client2D {
 		public void mousePressed(MouseEvent e) {
 			Point location = e.getLocationOnScreen();
 			if(statMenu!=null)
-			if(statMenu.isOpen()){
+			if(menu.currentMenu == STAT){
 				for(int i = 0; i < statMenu.statButtons.length; i++)
 					if(statMenu.statButtons[i].getArea().contains(location))
 						statMenu.statButtons[i].activate();
 			}
 			if(skillMenu!=null)
-			if(skillMenu.isOpen()){
+			if(menu.currentMenu == SKILL){
 				for(int i = 0; i < skillMenu.skillButtons.length; i++)
 					if(skillMenu.skillButtons[i].getArea().contains(location))
 						skillMenu.skillButtons[i].activate();
+			}
+			if(menu!=null){
+				if(menu.currentMenu != NONE){
+					for(int i = 0; i < menu.buttons.length; i++)
+						if(menu.buttons[i].getArea().contains(location))
+							menu.buttons[i].activate();
+				}
 			}
 			if(!inGame){
 				if(chooseClass){
@@ -946,7 +950,7 @@ public class Client2D {
 			if(dragging){
 				location = e.getLocationOnScreen();
 				SwitchItems switchItems = null;
-				if(currentChar.inventory.isOpen()){
+				if(menu.currentMenu == INV){
 					for(int i = 0; i < 8; i++){
 						if(currentChar.inventory.equipSlot[i].getArea().contains(location)){
 							switchItems = new SwitchItems();
@@ -961,7 +965,7 @@ public class Client2D {
 						}
 					}
 				}
-				if(switchItems == null && !(currentChar.inventory.getArea().contains(location)&&currentChar.inventory.isOpen())) switchItems = new SwitchItems();
+				if(switchItems == null && !(currentChar.inventory.getArea().contains(location)&&menu.currentMenu == INV)) switchItems = new SwitchItems();
 				if(switchItems!=null){
 				switchItems.previousI = previousI;
 				switchItems.previousJ = previousJ;
@@ -1088,14 +1092,8 @@ public class Client2D {
 				if(currentChar==null) return;
 				drawUI(g);
 				
-				if(statMenu.isOpen())
-					drawStatMenu(g);
-				if(skillMenu.isOpen())
-					drawSkillMenu(g);
-				if(currentChar!=null)
-					if(currentChar.inventory!=null)
-						if(currentChar.inventory.isOpen())
-							drawInventory(g);
+				if(menu.currentMenu!= NONE)
+				drawCurrentMenu(g);
 			
 				if(tooltip!=null)
 					drawItemTooltip(g);
@@ -1107,6 +1105,94 @@ public class Client2D {
 				
 			} else drawMainMenu(g);
 			
+		}
+		
+		private void drawCurrentMenu(Graphics2D g){
+			switch(menu.currentMenu){
+			case INV: drawInventory(g); break;
+			case STAT: drawStatMenu(g); break;
+			case SKILL: drawSkillMenu(g); break;
+			case NONE: return;
+			}
+			drawMenuBar(g);
+		}
+		
+		private void drawMenuBar(Graphics2D g){
+			g.setColor(Color.GRAY);
+			g.fill(menu.area);
+			g.setColor(Color.BLACK);
+			g.draw(menu.area);
+			
+			g.setFont(new Font("Arial", Font.BOLD, 14));
+			g.setColor(Color.DARK_GRAY);
+			g.fill(menu.buttons[0].getArea());
+			g.setColor(Color.RED);
+			g.draw(menu.buttons[0].getArea());
+			g.drawString(menu.buttons[0].name, menu.buttons[0].x+5, menu.buttons[0].y+15);
+			
+			
+			g.setFont(new Font("Arial", Font.PLAIN, 14));
+			for(int i = 1; i < menu.buttons.length; i++){
+				g.setColor(Color.LIGHT_GRAY);
+				g.fill(menu.buttons[i].getArea());
+				g.setColor(Color.BLACK);
+				g.draw(menu.buttons[i].getArea());
+				g.drawString(menu.buttons[i].name, menu.buttons[i].x+5, menu.buttons[i].y+20);
+			}
+			
+			g.setFont(new Font("Arial", Font.PLAIN, 16));
+
+			g.drawString("Damage : " + currentChar.getMinDamage() + " - " + currentChar.getMaxDamage(),
+					menu.area.x + 10, menu.area.y + 178);
+			g.drawString("Defense : " + currentChar.defense, menu.area.x + 10, menu.area.y + 354);
+			g.drawString("Damage reduction : " + new DecimalFormat("#.#").format(currentChar
+								.getDamageReduction()) + "%", menu.area.x + 10, menu.area.y + 420);
+
+			for (int i = 0; i < 10; i++)
+			{
+				if (i != Network.ALLSTATS)
+				{
+					String info = "";
+					switch (i)
+					{
+					case Network.SPIRIT:
+						info = "Spirit : ";
+						break;
+					case Network.POW:
+						info = "Power : ";
+						break;
+					case Network.AGI:
+						info = "Agility : ";
+						break;
+					case Network.VIT:
+						info = "Vitality : ";
+						break;
+					case Network.CRIT:
+						info = "Crit chance : ";
+						break;
+					case Network.CRITDMG:
+						info = "Crit damage : ";
+						break;
+					case Network.MASTERY:
+						info = "Mastery : ";
+						break;
+					case Network.IF:
+						info= "Item find : ";
+						break;
+					case Network.RF:
+						info= "Rare chance : ";
+						break;
+					}
+					if (i == Network.CRIT)
+						info += new DecimalFormat("#.#").format(currentChar.getStat(i));
+					else
+						info += (int) currentChar.getStat(i);
+					if (i == Network.CRIT || i == Network.CRITDMG || i == Network.MASTERY || i == Network.IF || i == Network.RF)
+						info += "%";
+					g.drawString(info, menu.area.x + 10, menu.area.y + 200 + i
+							* 22);
+				}
+			}
 		}
 		
 		private void drawMainMenu(Graphics2D g){
@@ -1203,6 +1289,9 @@ public class Client2D {
 			g.setColor(Color.GRAY);
 			g.fillRect(Inventory.x, Inventory.y, Inventory.width,
 					Inventory.height);
+			g.setColor(Color.BLACK);
+			g.drawRect(Inventory.x, Inventory.y, Inventory.width,
+					Inventory.height);
 
 			Item item;
 
@@ -1266,65 +1355,6 @@ public class Client2D {
 								null);
 				}
 			}
-
-			g.setFont(new Font("Arial", Font.PLAIN, 16));
-
-			g.drawString(
-					"Damage : " + currentChar.getMinDamage() + " - " + currentChar.getMaxDamage(),
-					Inventory.x + 20, Inventory.y + 178);
-			g.drawString("Defense : " + currentChar.defense, Inventory.x + 20,
-					Inventory.y + 354);
-			g.drawString(
-					"Damage reduction : "
-							+ new DecimalFormat("#.#").format(currentChar
-									.getDamageReduction()) + "%",
-					Inventory.x + 20, Inventory.y + 420);
-
-			for (int i = 0; i < 10; i++)
-			{
-				if (i != Network.ALLSTATS)
-				{
-					String info = "";
-					switch (i)
-					{
-					case Network.SPIRIT:
-						info = "Spirit : ";
-						break;
-					case Network.POW:
-						info = "Power : ";
-						break;
-					case Network.AGI:
-						info = "Agility : ";
-						break;
-					case Network.VIT:
-						info = "Vitality : ";
-						break;
-					case Network.CRIT:
-						info = "Crit chance : ";
-						break;
-					case Network.CRITDMG:
-						info = "Crit damage : ";
-						break;
-					case Network.MASTERY:
-						info = "Mastery : ";
-						break;
-					case Network.IF:
-						info= "Item find : ";
-						break;
-					case Network.RF:
-						info= "Rare chance : ";
-						break;
-					}
-					if (i == Network.CRIT)
-						info += new DecimalFormat("#.#").format(currentChar.getStat(i));
-					else
-						info += (int) currentChar.getStat(i);
-					if (i == Network.CRIT || i == Network.CRITDMG || i == Network.MASTERY || i == Network.IF || i == Network.RF)
-						info += "%";
-					g.drawString(info, Inventory.x + 20, Inventory.y + 200 + i
-							* 22);
-				}
-			}
 		}
 		
 		private void drawDrops(Graphics2D g){
@@ -1356,8 +1386,12 @@ public class Client2D {
 		{
 			g.setColor(Color.GRAY);
 			g.fill(skillMenu.getArea());
+			g.setColor(Color.BLACK);
+			g.draw(skillMenu.getArea());
+			
 			for (SkillButton skillButton : skillMenu.skillButtons)
 			{
+				if(skillButton == null || skillButton.getArea() == null) continue;
 				g.setColor(Color.WHITE);
 				g.fill(skillButton.getArea());
 
@@ -1393,18 +1427,16 @@ public class Client2D {
 				}else{
 					lvl = "" + currentChar.skillLvls[skillButton.skillSlot];
 				}
+				g.setFont(new Font("Arial", Font.PLAIN, 12));
 				g.drawString(lvl, skillButton.getNamePos().x + 15,
 						skillButton.getNamePos().y - 20);
-				g.drawString(skillButton.getInfo(0),
-						skillButton.getNamePos().x - 415,
-						skillButton.getNamePos().y - 20);
-				g.drawString(skillButton.getInfo(1),
-						skillButton.getNamePos().x - 415,
-						skillButton.getNamePos().y + 10);
+				g.drawString(skillButton.getInfo(),
+						skillButton.getNamePos().x - 410,
+						skillButton.getNamePos().y - 10);
 			}
 
 			g.setColor(Color.WHITE);
-			g.drawString("Remaining points : " + currentChar.skillStats, 750, 500);
+			g.drawString("Remaining points : " + currentChar.skillStats, 950, 500);
 		}
 		
 		private void drawStatMenu(Graphics2D g)
@@ -1412,6 +1444,9 @@ public class Client2D {
 			g.setFont(new Font("Arial", Font.PLAIN, 14));
 			g.setColor(Color.GRAY);
 			g.fill(statMenu.getArea());
+			g.setColor(Color.BLACK);
+			g.draw(statMenu.getArea());
+			
 			for (int i = 0; i < statMenu.statButtons.length; i++)
 			{
 				g.setColor(Color.WHITE);
@@ -1423,14 +1458,12 @@ public class Client2D {
 				g.drawString(statMenu.statButtons[i].getInfo(),
 						statMenu.statButtons[i].getTextPosition().x + 50,
 						statMenu.statButtons[i].getTextPosition().y - 20);
-				// g.drawString(statMenu.statButtons[i].getTotal(),
-				// statMenu.statButtons[i].getTextPosition().x + 50,
-				// statMenu.statButtons[i].getTextPosition().y + 5);
+
 				g.drawString(Integer.toString(currentChar.atts[i]),
 						statMenu.statButtons[i].getTextPosition().x + 8,
 						statMenu.statButtons[i].getTextPosition().y - 25);
 				g.setColor(Color.WHITE);
-				g.drawString("Remaining points : " + currentChar.attStats, 390, 480);
+				g.drawString("Remaining points : " + currentChar.attStats, statMenu.getArea().x+100, 480);
 			}
 		}
 		
@@ -1554,14 +1587,57 @@ public class Client2D {
 		}
 	}
 	
+	public class MenuBar
+	{
+		int currentMenu = 0;
+		public Rectangle area = new Rectangle(550,38,200,550);
+		MenuButton[] buttons = new MenuButton[4];
+		
+		public MenuBar(){
+			for(int i = 0; i <= 3; i++){
+				buttons[i] = new MenuButton(i, this);
+			}
+		}
+		
+		public class MenuButton{
+			String name;
+			MenuBar menu;
+			int menuNumber;
+			int x = 600, y, width=100, height=40;
+			
+			MenuButton(int i, MenuBar menu){
+				this.menu = menu;
+				menuNumber = i;
+				y=i*45+10;
+				switch(i){
+				case INV: name = "Inventory"; break;
+				case STAT: name = "Stats"; break;
+				case SKILL: name = "Skills"; break;
+				case NONE: name = "X";
+				y = 38;
+				x = 1230;
+				width = 20;
+				height = 20;
+				break;
+				}
+			}
+			
+			public Rectangle getArea(){return new Rectangle(x,y,width,height);}
+			
+			public void activate(){
+				if(menuNumber == SKILL) skillMenu.refresh();
+				menu.currentMenu = menuNumber;
+			}
+		}
+	}
 	
 	public class SkillButton
 	{
 		int skill, skillSlot;
 		private Rectangle area;
 		Point namePos;
-		public SkillData skillData;
-		public PassiveData passiveData;
+		public SkillData skillData, nextSkillData;
+		public PassiveData passiveData, nextPassiveData;
 		boolean passive;
 
 		public SkillButton(int i)
@@ -1655,15 +1731,14 @@ public class Client2D {
 			return skillData.manaUsed*(currentChar.atts[Network.SPIRIT]+100)/100;
 		}
 
-		public String getInfo(int nextLevel)
+		public String getInfo()
 		{
-			if(currentChar.passiveLvls[skillSlot]+nextLevel > 10) return "Max level";
-			if (currentChar.skillLvls[skillSlot] + nextLevel == 0) return "Not acquired yet.";
 			String info = "";
 
 			if (passive)
 			{
-				passiveData = new PassiveData(skill, currentChar.passiveLvls[skillSlot]+nextLevel);
+				passiveData = new PassiveData(skill, currentChar.passiveLvls[skillSlot]);
+				nextPassiveData = new PassiveData(skill, currentChar.passiveLvls[skillSlot]+1);
 				
 				switch (skill)
 				{
@@ -1672,22 +1747,24 @@ public class Client2D {
 				case PassiveSkill.BowMastery:
 					info += "Increases weapon damage by "
 							+ passiveData.statBonus[Network.WATK]
+									+" ("+ nextPassiveData.statBonus[Network.WATK]+")"
 							+ " and weapon mastery by "
-							+ passiveData.statBonus[Network.MASTERY];
+							+ passiveData.statBonus[Network.MASTERY]
+								+" ("+ nextPassiveData.statBonus[Network.MASTERY]+")";
 				}
 			} else
 			{
-				skillData = new SkillData(skill, currentChar.skillLvls[skillSlot]+nextLevel);
+				skillData = new SkillData(skill, currentChar.skillLvls[skillSlot]);
+				nextSkillData = new SkillData(skill, currentChar.skillLvls[skillSlot]+1);
 	
 				info += "Deals ";
-				info += new DecimalFormat("#.##").format(skillData
-						.dmgMult[0]) + " times your damage to ";
-				info += skillData.maxEnemiesHit;
+				info += new DecimalFormat("#.##").format(skillData.dmgMult[0]) + " ("+new DecimalFormat("#.##").format(nextSkillData.dmgMult[0])+")"+" times your damage to ";
+				info += skillData.maxEnemiesHit +" ("+nextSkillData.maxEnemiesHit+")";
 				if (skillData.maxEnemiesHit == 1)
 					info += " enemy.";
 				else
 					info += " enemies.";
-				info += "Hits " + skillData.getMaxHits();
+				info += "Hits " + skillData.getMaxHits()+" ("+nextSkillData.getMaxHits()+")";
 				if (skillData.getMaxHits() == 1)
 					info += " time.";
 				else
@@ -1713,8 +1790,7 @@ public class Client2D {
 	{
 
 		public SkillButton[] skillButtons = new SkillButton[3];
-		private boolean open;
-		private int x = 600, y = 100, width = 600, height = 425;
+		private int x = 750, y = 38, width = 500, height = 550;
 
 		public SkillMenu()
 		{}
@@ -1724,8 +1800,8 @@ public class Client2D {
 			if(currentChar!=null)
 			for(int i = 0; i < skillButtons.length; i++){
 				skillButtons[i] = new SkillButton(i+1);
-				skillButtons[i].setArea(new Rectangle(x + width - 140, y + 30 + i * 125, 100, 100));
-				skillButtons[i].namePos = new Point(x + width - 110, y + 85+ i * 125);
+				skillButtons[i].setArea(new Rectangle(x + width - 110, y + 50 + i * 75, 100, 50));
+				skillButtons[i].namePos = new Point(x + width - 80, y + 85 + i * 75);
 			}
 		}
 
@@ -1733,19 +1809,6 @@ public class Client2D {
 		{
 			return new Rectangle(x, y, width, height);
 		}
-
-		public boolean isOpen()
-		{
-			return open;
-		}
-
-		public void toggle()
-		{
-			refresh();
-			open = !open;
-			if(currentChar.inventory.isOpen())currentChar.inventory.toggle();
-		}
-
 	}
 
 	public class StatButton
@@ -1753,7 +1816,7 @@ public class Client2D {
 
 		private Rectangle area;
 		private int stat;
-		private String text, info;
+		private String text, info = "";
 		private Point textPosition;
 
 		public StatButton(Point position, int stat)
@@ -1795,6 +1858,8 @@ public class Client2D {
 
 		public String getInfo()
 		{
+			if(info != "") return info;
+			
 			switch (stat)
 			{
 			case Network.SPIRIT:
@@ -1825,32 +1890,18 @@ public class Client2D {
 	{
 
 		public StatButton[] statButtons = new StatButton[4];
-		private Rectangle area;
-		private boolean open = false;
+		private Rectangle area = new Rectangle(750, 38, 500, 550);
 
 		public StatMenu()
 		{
-			area = new Rectangle(100, 100, 450, 400);
 			for (int i = 0; i < 4; i++)
-				statButtons[i] = new StatButton(new Point(110, 110 + i * 100),
-						i);
+				statButtons[i] = new StatButton(new Point(area.x+10, 80 + i * 100), i);
 
-		}
-
-		public void toggle()
-		{
-			open = !open;
-			if(currentChar.inventory.isOpen())currentChar.inventory.toggle();
 		}
 
 		public Rectangle getArea()
 		{
 			return area;
-		}
-
-		public boolean isOpen()
-		{
-			return open;
 		}
 	}
 	

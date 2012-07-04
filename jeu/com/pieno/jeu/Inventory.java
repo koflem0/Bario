@@ -6,16 +6,16 @@ import java.io.Serializable;
 public class Inventory implements Serializable{
 		
 		private static final long serialVersionUID = 9172706841883239806L;
-		private boolean open;
 		public Item[][] items = new Item[8][8];
 		transient ItemSlot[][] itemSlot = new ItemSlot[8][8];
 		public Item[] equip = new Item[8];
 		transient ItemSlot[] equipSlot = new ItemSlot[8];
-		public static final int x = 550,y = 38,width = 700,height = 550;
+		public static final int x = 750,y = 38,width = 500,height = 550;
 		
 		public Inventory(){
 			
 			equip[Item.WEAPON] = new Item();
+			generateSlots();
 		}
 		
 		public void generateSlots(){
@@ -92,12 +92,6 @@ public class Inventory implements Serializable{
 			}
 	
 			return false;
-		}
-		
-		public boolean isOpen() {return open;}
-		public void toggle() {
-			generateSlots();
-			open = !open;
 		}
 		
 	}

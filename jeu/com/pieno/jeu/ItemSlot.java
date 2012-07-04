@@ -14,13 +14,13 @@ public class ItemSlot implements Serializable{
 		public ItemSlot(int i, Inventory inventory){
 			this.i = i;
 			this.inventory = inventory;
-			area = new Rectangle(Inventory.x+220+i*55, Inventory.y+20, 50, 50);
+			area = new Rectangle(Inventory.x+20+i*55, Inventory.y+20, 50, 50);
 			equip = true;
 		}
 		
 		public ItemSlot(int i, int j, Inventory inventory){
 			this.i = i; this.j = j; this.inventory = inventory;
-			area = new Rectangle(Inventory.x+220+i*55, Inventory.y+100+j*55,50,50);
+			area = new Rectangle(Inventory.x+20+i*55, Inventory.y+100+j*55,50,50);
 			equip = false;
 		}
 		/*
