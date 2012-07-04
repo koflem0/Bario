@@ -1142,8 +1142,7 @@ public class Client2D {
 				g.setColor(Color.WHITE);
 				g.fill(classButton.getArea());
 				g.setColor(Color.BLACK);
-				g.drawString(classButton.info(), classButton.infoPos.x,
-						classButton.infoPos.y);
+				g.drawString(classButton.info(), classButton.infoPos.x, classButton.infoPos.y);
 			}
 		}
 		
@@ -1156,20 +1155,20 @@ public class Client2D {
 		{
 
 			Tooltip ttip = equippedTooltip;
-
-			g.setColor(Color.WHITE);
-			Rectangle r = ttip.getArea();
-			g.fillRect((int) r.getX(), (int) r.getY() - 20, (int) r.getWidth(),
-					(int) r.getHeight() + 20);
-			g.setColor(Color.BLACK);
-			g.setFont(new Font("Arial", Font.PLAIN, 14));
-			g.drawString("Currently Equipped : ", (int) r.getX() + 7,
-					(int) r.getY() - 5);
-			drawTooltip(g, ttip, r);
+			if(ttip != null){
+				g.setColor(Color.WHITE);
+				Rectangle r = ttip.getArea();
+				g.fillRect((int) r.getX(), (int) r.getY() - 20, (int) r.getWidth(), (int) r.getHeight() + 20);
+				g.setColor(Color.BLACK);
+				g.setFont(new Font("Arial", Font.PLAIN, 14));
+				g.drawString("Currently Equipped : ", (int) r.getX() + 7, (int) r.getY() - 5);
+				drawTooltip(g, ttip, r);
+			}
 		}
 		
 		private void drawTooltip(Graphics2D g, Tooltip ttip, Rectangle r)
 		{
+			Item item = ttip.getItem();
 			g.draw(r);
 			g.drawLine((int) r.getX(), (int) r.getY() + 46,
 					(int) (r.getX() + r.getWidth()), (int) r.getY() + 46);
@@ -1177,10 +1176,10 @@ public class Client2D {
 			for (int i = 1; i <= 8; i++)
 			{
 				g.setColor(Color.BLACK);
-				if ((i == 1 && ttip.getItem().getRarity() == Item.MAGIC)
-						|| (i == 2 && ttip.getItem().getEnhancedD() != 0))
+				if ((i == 1 && item.getRarity() == Item.MAGIC) || (i == 2 && (item.getEnhancedD() != 0 || 
+						((item.getSlot() == Item.WEAPON && item.getStat(Network.WATK)!=0) || item.getSlot()!=Item.WEAPON && item.getStat(Network.DEFENSE) != 0))))
 					g.setColor(Color.BLUE);
-				if (i == 1 && ttip.getItem().getRarity() == Item.RARE)
+				if (i == 1 && item.getRarity() == Item.RARE)
 					g.setColor(Color.ORANGE);
 				g.drawString(ttip.getInfo(i), (int) r.getX() + 7,
 						(int) r.getY() + 2 + 20 * i);
@@ -1189,15 +1188,15 @@ public class Client2D {
 
 		private void drawItemTooltip(Graphics2D g)
 		{
-
 			Tooltip ttip = tooltip;
-
-			g.setColor(Color.WHITE);
-			Rectangle r = ttip.getArea();
-			g.fill(r);
-			g.setColor(Color.BLACK);
-			g.setFont(new Font("Arial", Font.PLAIN, 14));
-			drawTooltip(g, ttip, r);
+			if(ttip != null){
+				g.setColor(Color.WHITE);
+				Rectangle r = ttip.getArea();
+				g.fill(r);
+				g.setColor(Color.BLACK);
+				g.setFont(new Font("Arial", Font.PLAIN, 14));
+				drawTooltip(g, ttip, r);
+			}
 		}
 		
 		private void drawInventory(Graphics2D g)

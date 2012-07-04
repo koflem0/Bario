@@ -1569,7 +1569,7 @@ public class Server2D {
 					charlist.add(loggedIn.get(i));
 
 		Character c = charlist.get(rand.nextInt(charlist.size()));
-
+		
 		if ((rand.nextInt(100)) < m.getdropchance() * (100 + c.getStat(Network.IF)) / 100) {
 			int id = c.id;
 
@@ -1635,9 +1635,9 @@ public class Server2D {
 					m.die();
 					for (int j = 0; j < loggedIn.size(); j++) {
 						if (loggedIn.get(j).map.equals(c.map)) {
-							if (loggedIn.get(j).lvl > m.getLevel() - 5) {
+							if (loggedIn.get(j).lvl <= m.getLevel() + 5 && loggedIn.get(j).lvl > m.getLevel()-10) {
 								
-								if (loggedIn.get(j).lvl < m.getLevel()) loggedIn.get(j).exp += m.getExp() *(1-0.2f*(m.getLevel() - loggedIn.get(j).lvl));
+								if (loggedIn.get(j).lvl > m.getLevel()) loggedIn.get(j).exp += m.getExp() *(1-0.15f*(loggedIn.get(j).lvl - m.getLevel()));
 								else loggedIn.get(j).exp += m.getExp();
 								
 								if (c.exp >= Character.expToLvl(c.lvl)) {

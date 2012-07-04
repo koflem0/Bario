@@ -14,7 +14,7 @@ public class Network {
 	static public final int port = 54555;
 	static public final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3, JUMP = 4;
 	public static final int POW = 0, AGI = 1, SPIRIT = 2, VIT = 3, CRIT = 4,
-			CRITDMG = 5, MASTERY = 6, ALLSTATS = 7, HP = 11, MANA = 10, IF = 8, RF = 9, DEFENSE = 19, WATK = 20;
+			CRITDMG = 5, MASTERY = 6, ALLSTATS = 7, HP = 11, MANA = 10, IF = 8, RF = 9, DEFENSE = 12, WATK = 13;
 	public static final int ARROW = 0, ENERGY = 2, FIRE = 3;
 	public static final int EXPLOSION = 0, EXPLOARROW = 1, LVLUP = 2;
 	public static final int walkL = 0, walkR = 1, standL = 2, standR = 3,

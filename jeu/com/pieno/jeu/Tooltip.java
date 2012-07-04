@@ -33,7 +33,7 @@ public class Tooltip {
 			number++;
 		}
 		
-		for(int i = 0; i < 12; i++){
+		for(int i = 0; i < 14; i++){
 			if(item.getStat(i)!=0) {
 				stats[number]="+";
 				stats[number]+=item.getStat(i);
@@ -50,6 +50,8 @@ public class Tooltip {
 				case Network.RF: stats[number]+="% Rare Chance"; break;
 				case Network.HP: stats[number]+=" Health"; break;
 				case Network.MANA: stats[number]+=" Mana"; break;
+				case Network.WATK: stats[number]+=" Damage"; break;
+				case Network.DEFENSE: stats[number]+=" Defense";break;
 				}
 				number++;
 			}
@@ -62,7 +64,7 @@ public class Tooltip {
 		if(item.getSlot() == Item.WEAPON) {
 			switch(line){
 			case 1 : info+="Weapon"; break;
-			case 2 : info+=item.getD() + " damage";break;
+			case 2 : info+= item.getD() + " damage";break;
 			case 8: info+="Required level : " + item.getLevel();break;
 			default : if(stats[line-3] !=null) info = stats[line-3];
 			}

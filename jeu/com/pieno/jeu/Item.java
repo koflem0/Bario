@@ -12,7 +12,7 @@ public class Item implements Serializable{
 		
 	private int slot, rarity, level, classReq = -1, enhancedD=0;
 	private float damage, defense;
-	private int[] stats = new int[14];
+	private int[] stats = new int[20];
 	
 	public Item(){
 		this.slot = 0;
@@ -31,18 +31,15 @@ public class Item implements Serializable{
 	private void generateD(){
 		switch(slot){
 		case(RING):case(AMULET): break;
-		case(WEAPON) : damage = (int)Math.floor(Math.pow(1.1, level-1)*4.5); break;
-		case(TORSO) : defense = (int)Math.floor(Math.pow(1.1, level-1)*4); break;
-		default : defense = (int)Math.floor(Math.pow(1.1, level-1)*3); break;
+		case(WEAPON) : damage = (int)Math.floor(Math.pow(1.08, level-1)*4.5); break;
+		case(TORSO) : defense = (int)Math.floor(Math.pow(1.08, level-1)*4); break;
+		default : defense = (int)Math.floor(Math.pow(1.08, level-1)*3); break;
 		}
 		
 		Random rand = new Random();
-		
-		defense = (defense*(100+enhancedD)/100);
-		defense = (defense *(90+rand.nextInt(41))/100);
-		damage = (damage*(100+enhancedD)/100);
-		if(level > 1)
-		damage = (damage *(90+rand.nextInt(41))/100);
+		int quality = rand.nextInt(21);
+		defense = (defense+stats[Network.DEFENSE])*(100+enhancedD)/100*(90+quality)/100;
+		damage = (damage+stats[Network.WATK])*(100+enhancedD)/100*(90+quality)/100;
 		
 	}
 	
@@ -75,20 +72,41 @@ public class Item implements Serializable{
 	private void generateNewStat(int i){
 		Random rand = new Random();
 		int stat;
-		int statMax = 12;
+		int statMax = 14;
 		if(i == 0 && slot!=RING && slot!=AMULET){
 			stat = rand.nextInt(4);
 			if(stat < 1) enhancedD = rand.nextInt(15) + 11;
 			else {
 				do{stat = rand.nextInt(statMax);}
-				while(stats[stat] != 0 || (stat==Network.MASTERY && slot != WEAPON));
+				while(stats[stat] != 0 || !checkCompatible(stat,slot));
 				generateStat(stat);
 			}
 		} else {
 			do{stat = rand.nextInt(statMax);}
-			while(stats[stat] != 0 || (stat==Network.MASTERY && slot != WEAPON));
+			while(stats[stat] != 0 || !checkCompatible(stat,slot));
 			generateStat(stat);
 		}
+	}
+	
+	private boolean checkCompatible(int stat, int slot){
+		switch(slot){
+		case WEAPON: 
+			switch(stat){
+			case Network.DEFENSE:return false;
+			}
+		break;
+		case GLOVES: 
+			switch(stat){
+			case Network.MASTERY:return false;
+			}
+		break;
+		default: 
+			switch(stat){
+			case Network.MASTERY:return false;
+			case Network.WATK:return false;
+			}
+		}
+		return true;
 	}
 	
 	private void generateStat(int stat){
@@ -111,6 +129,9 @@ public class Item implements Serializable{
 		case Network.IF:
 		case Network.RF:
 			stats[stat] =(int) ((rand.nextDouble()*2 + 5)*Math.pow(1.05,level)); break;
+		case Network.WATK:
+		case Network.DEFENSE:
+			stats[stat] =(int) ((rand.nextDouble()*0.5+1)*Math.pow(1.05,level)); break;
 		}
 	}
 	
