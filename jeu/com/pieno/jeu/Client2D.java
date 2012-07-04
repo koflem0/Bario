@@ -442,7 +442,7 @@ public class Client2D {
 		chooseClass = false;
 		inGame = false;
 		client.sendTCP(new RemoveCharacter());
-		try {Thread.sleep(10);} catch (InterruptedException e) {}
+		try {Thread.sleep(50);} catch (InterruptedException e) {}
 		currentMap = null;
 		currentChar = null;
 		projectiles = new HashMap<Integer, ProjectileAnimation>();
@@ -1008,7 +1008,6 @@ public class Client2D {
 					
 					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 	                         RenderingHints.VALUE_ANTIALIAS_ON);
-					
 					draw(g);
 					g.dispose();
 					S.update();
@@ -1085,10 +1084,10 @@ public class Client2D {
 				drawChars(g);
 			
 				drawDamageText(g);
-				if(currentChar!=null)
-					drawUI(g);
-				else return;
-			
+				
+				if(currentChar==null) return;
+				drawUI(g);
+				
 				if(statMenu.isOpen())
 					drawStatMenu(g);
 				if(skillMenu.isOpen())
