@@ -376,7 +376,7 @@ public class Server2D extends JFrame implements WindowListener {
 			}
 
 			public void disconnected(Connection c) {
-
+				connectionsList.removeElement(c);
 				CharacterConnection connection = (CharacterConnection) c;
 				if (connection.character != null) {
 					saveCharacter(connection.character);
@@ -387,7 +387,6 @@ public class Server2D extends JFrame implements WindowListener {
 					server.sendToAllTCP(removeCharacter);
 				}
 				characterConnections.remove(c);
-				connectionsList.removeElement(c);
 			}
 		});
 		ip = InetAddress.getLocalHost().getHostAddress();
@@ -510,9 +509,23 @@ public class Server2D extends JFrame implements WindowListener {
 		server.sendToAllTCP(addCharacter);
 		updateInventory(addCharacter.character);
 	}
+	
+	public static boolean isMac()
+	{
+
+		String os = System.getProperty("os.name").toLowerCase();
+		return (!(os.indexOf("win") >= 0));
+
+	}
 
 	boolean saveCharacter(Character character) {
-		File file = new File("characters", character.name + "/save" + character.saveSlot + ".sav");
+		File rootDir = new File("C:/");
+		if (isMac())
+			rootDir = new File(System.getProperty("user.home")
+					+ "/Documents");
+
+
+		File file = new File(rootDir, "jeu/" + character.name + "/save" + character.saveSlot + ".sav");
 		file.getParentFile().mkdirs();
 
 		if (character.id == 0) {
@@ -555,7 +568,11 @@ public class Server2D extends JFrame implements WindowListener {
 	}
 
 	Character loadCharacter(String name, int saveSlot) {
-		File file = new File("characters", name + "/save" + saveSlot + ".sav");
+		File rootDir = new File("C:/");
+		if (isMac())
+			rootDir = new File(System.getProperty("user.home")
+					+ "/Documents");
+		File file = new File(rootDir, "jeu/" + name + "/save" + saveSlot + ".sav");
 		if (!file.exists())
 			return null;
 		ObjectInputStream input = null;

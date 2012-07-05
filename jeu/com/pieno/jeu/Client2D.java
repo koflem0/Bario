@@ -315,6 +315,7 @@ public class Client2D {
 		draw.run();
 		
 		S.restoreScreen();
+		client.close();
 	}
 	
 	void sendKeys(){
