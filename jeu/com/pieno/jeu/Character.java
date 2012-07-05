@@ -31,6 +31,10 @@ public class Character {
 	
 	public Character(){}
 	
+	public String toString(){
+		return id + " " + name;
+	}
+	
 	public float getStat(int stat)
 	{
 		switch (stat)
@@ -252,6 +256,8 @@ public class Character {
 			}
 			
 			updateXspeed(timePassed);
+			
+			if(!invincible && !canMove) canMove = true;
 			
 			if(canMove)
 				vx=0.37d*xspeed;

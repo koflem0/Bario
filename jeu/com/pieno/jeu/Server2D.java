@@ -5,9 +5,15 @@ import com.pieno.jeu.Ladder;
 import com.pieno.jeu.Platform;
 import com.pieno.jeu.Wall;
 
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -23,16 +29,28 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 import com.pieno.jeu.Network.*;
 
-public class Server2D {
+public class Server2D extends JFrame implements WindowListener {
 	Server server;
 	PhysicsThread PT;
 	SendThread ST;
+	String ip;
+	Vector<CharacterConnection> characterConnections = new Vector<CharacterConnection>();
 	Vector<Character> loggedIn = new Vector<Character>();
 	Vector<Map> maps = new Vector<Map>();
 	HashMap<String, Vector<Projectile>> projectiles = new HashMap<String, Vector<Projectile>>();
@@ -40,7 +58,17 @@ public class Server2D {
 	HashMap<String, Vector<Drop>> drops = new HashMap<String, Vector<Drop>>();
 	Vector<String> loadedMaps = new Vector<String>();
 
+	public JPanel pane1, pane2, pane3, content;
+
+	public JButton dc_btn;
+	public JList loggedIn_l;
+	public DefaultListModel connectionsList = new DefaultListModel();
+	
 	public static void main(String[] args) throws IOException {
+		start();
+	}
+	
+	public static void start() throws IOException {
 		Log.set(Log.LEVEL_INFO);
 		new Server2D();
 	}
@@ -48,10 +76,10 @@ public class Server2D {
 	public Server2D() throws IOException {
 		server = new Server() {
 			protected Connection newConnection() {
-				// By providing our own connection implementation, we can store
-				// per
-				// connection state without a connection ID to state look up.
-				return new CharacterConnection();
+				CharacterConnection c = new CharacterConnection();
+				characterConnections.add(c);
+				connectionsList.addElement(c);
+				return c;
 			}
 		};
 
@@ -358,14 +386,87 @@ public class Server2D {
 					removeCharacter.id = connection.character.id;
 					server.sendToAllTCP(removeCharacter);
 				}
+				characterConnections.remove(c);
+				connectionsList.removeElement(c);
 			}
 		});
+		ip = InetAddress.getLocalHost().getHostAddress();
 		server.bind(new InetSocketAddress(InetAddress.getLocalHost(), Network.port), new InetSocketAddress(InetAddress.getLocalHost(), Network.port + 1));
 		server.start();
 		PT = new PhysicsThread();
 		PT.start();
 		ST = new SendThread();
 		ST.start();
+		
+		initWindow();
+	}
+	
+	void initWindow(){
+		
+		setTitle("Server - " + ip);
+		
+		dc_btn = new JButton();
+		dc_btn.setText("Disconnect");
+		dc_btn.addActionListener(new ActionListener()
+		{
+
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				int selected = loggedIn_l.getSelectedIndex();
+
+				if (selected > -1 && characterConnections.size() > selected)
+				{
+
+					if(characterConnections.get(selected).character != null)
+					{
+						saveCharacter(characterConnections.get(selected).character);
+
+						RemoveCharacter removeCharacter = new RemoveCharacter();
+						removeCharacter.id = characterConnections.get(selected).character.id;
+						loggedIn.remove(characterConnections.get(selected).character);
+						server.sendToAllTCP(removeCharacter);
+
+					}
+					
+					characterConnections.get(selected).close();
+					
+					
+
+				}
+
+			}
+
+		});
+		loggedIn_l = new JList(connectionsList);
+		
+		pane1 = new JPanel();
+		pane1.setLayout(new GridLayout(1, 1, 1, 1));
+		pane1.add(dc_btn);
+
+		pane2 = new JPanel();
+		pane2.add(new JLabel(ip));
+
+		pane3 = new JPanel();
+		pane3.setLayout(new BorderLayout(1, 1));
+		pane3.add(pane1, BorderLayout.NORTH);
+		pane3.add(new JScrollPane(loggedIn_l), BorderLayout.CENTER);
+		pane3.add(pane2, BorderLayout.SOUTH);
+
+		content = new JPanel();
+		content.setLayout(new GridLayout(1, 1, 1, 1));
+		content.add(pane3);
+
+		content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+		setContentPane(content);
+		pack();
+		setSize(500,800);
+		setResizable(false);
+		setLocationRelativeTo(null);
+		addWindowListener(this);
+		setVisible(true);
+		
 	}
 
 	void updateInventory(Character c) {
@@ -506,6 +607,18 @@ public class Server2D {
 	// This holds per connection state.
 	static class CharacterConnection extends Connection {
 		public Character character;
+		
+		public String toString(){
+			try{
+			InetAddress address = getRemoteAddressTCP().getAddress();
+			if(character!=null){
+				return character.toString() + " connection " + getID() + ", " + address.getHostAddress();
+			}
+			return  "No character (" + address.getHostName() +") connection "+ getID() + ", "+ address.getHostAddress();
+			} catch (Exception e){
+				return "Connection "+getID();
+			}
+		}
 	}
 
 	public void sendStats(Character c) {
@@ -713,7 +826,7 @@ public class Server2D {
 				}
 				collisions(c, c.map);
 				c.update(timePassed);
-				if (c.lastSave > 20000 && c.alive) {
+				if (c.lastSave > 60000 && c.alive) {
 					saveCharacter(c);
 					c.lastSave = 0;
 				}
@@ -1760,4 +1873,26 @@ public class Server2D {
 		}
 
 	}
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {}
+	@Override
+	public void windowClosed(WindowEvent arg0) {}
+	@Override
+	public void windowClosing(WindowEvent e) {
+		for(int i = 0; i < loggedIn.size(); i++){
+			saveCharacter(loggedIn.get(i));
+		}
+		server.close();
+		System.exit(0);
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {}
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {}
+	@Override
+	public void windowIconified(WindowEvent arg0) {}
+	@Override
+	public void windowOpened(WindowEvent arg0) {}
 }

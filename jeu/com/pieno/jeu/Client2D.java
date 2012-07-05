@@ -263,13 +263,18 @@ public class Client2D {
 		ui = new UI();
 		String host = "";
 		try{
-			host = client.discoverHost(Network.port+1, 2000).getHostAddress();
+			host = client.discoverHost(Network.port+1, 1000).getHostAddress();
 		} catch (Exception e){
 			try {
-				host = InetAddress.getLocalHost().getHostAddress();
-				host = ui.inputHost(host);
-			} catch (UnknownHostException e1) {
-				host = ui.inputHost(host);
+				Server2D.start();
+				host = client.discoverHost(Network.port+1, 1500).getHostAddress();
+			} catch (Exception e1) {
+				try{
+					host = InetAddress.getLocalHost().getHostAddress();
+					host = ui.inputHost(host);
+				} catch (Exception e2){
+					host = ui.inputHost(host);
+				}
 			}
 		}
 		
@@ -287,7 +292,15 @@ public class Client2D {
 		auth.name = name;
 		auth.pass = pass;
 		client.sendTCP(auth);
-		while(!authenticated){try{Thread.sleep(50);}catch(Exception e){}}
+		int tries = 0;
+		while(!authenticated){try{
+			Thread.sleep(50);
+			tries++;
+			if(tries > 200) {
+				JOptionPane.showMessageDialog(null, "Authentication error", "Error", JOptionPane.ERROR_MESSAGE);
+				System.exit(0);
+			}
+			}catch(Exception e){}}
 		
 		mainMenu = new SaveMenu();
 		classMenu = new ClassMenu();
@@ -302,7 +315,6 @@ public class Client2D {
 		draw.run();
 		
 		S.restoreScreen();
-		System.exit(0);
 	}
 	
 	void sendKeys(){
