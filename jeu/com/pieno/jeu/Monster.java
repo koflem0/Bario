@@ -35,20 +35,21 @@ public class Monster {
 
 	Character isAggro = null;
 	int type = 0, eliteT = -1, summonType = -1, maxSummons = 0, summonTimer = 0, summonTime = 8000;
-	boolean elite = false;
 	private Point spawnPoint;
 	private int timer, deathTimer = 200, regen = 0;
 
 	long aggroTimer = 5000;
 	
-	public Monster(int i, Point spawn, float statMultiplier){
+	public Monster(int i, Point spawn, float statMultiplier, int eliteType){
 		this(i, spawn);
 		allStatsMultiplier = statMultiplier;
 		special = true;
 		summonType = -1;
 		summons = null;
+		timer = 60000;
 		statMultipliers[SPD] = 0.9f/statMultiplier;
 		lvl-=1;
+		generateElite(eliteType);
 		init();
 	}
 	
@@ -205,26 +206,30 @@ public class Monster {
 		alive = true;
 	}
 	
-	public void randomElite(){
-		Random rand = new Random();
-		if(1 > rand.nextInt(10)){
-			elite = true;
-			allStatsMultiplier = 1.3f;
-			
-			eliteT = rand.nextInt(4);
-			switch(eliteT){
-			case DEF : statMultipliers[DEF] = 1.3f; break;
-			case DMG : statMultipliers[DMG] = 1.3f; break;
-			case SPD : statMultipliers[SPD] = 1.3f; break;
-			case SLOW : statMultipliers[DEF] = 1.2f; statMultipliers[SPD] = 0.6f; statMultipliers[DMG] = 1.2f; break;
-			}
-		} else {
-			eliteT = -1;
-			elite = false;
+	public void generateElite(int type){
+		eliteT = type;
+		if(type == -1){
 			allStatsMultiplier = 1;
 			for(int i = 0; i < 10; i++){
 				statMultipliers[i] = 1;
 			}
+			return;
+		}
+		allStatsMultiplier = 1.3f;
+		switch(eliteT){
+		case DEF : statMultipliers[DEF] = 1.3f; break;
+		case DMG : statMultipliers[DMG] = 1.3f; break;
+		case SPD : statMultipliers[SPD] = 1.3f; break;
+		case SLOW : statMultipliers[DEF] = 1.2f; statMultipliers[SPD] = 0.6f; statMultipliers[DMG] = 1.2f; break;
+		}
+	}
+	
+	public void randomElite(){
+		Random rand = new Random();
+		if(1 > rand.nextInt(10)){
+			generateElite(rand.nextInt(4));
+		} else {
+			generateElite(-1);
 		}
 	}
 	
@@ -257,7 +262,7 @@ public class Monster {
 	}
 
 	public int getLevel() {
-		if(elite) return lvl + 2;
+		if(eliteT != -1) return lvl + 2;
 		return lvl;
 	}
 
@@ -275,10 +280,16 @@ public class Monster {
 				if(summons.size() < maxSummons){
 					summonTimer -= timePassed;
 					if(summonTimer <= 0){
-						summons.add(new Monster(summonType, new Point(getX(),getY()-yCorrection), summonMultiplier));
+						summons.add(new Monster(summonType, new Point(getX(),getY()-yCorrection), summonMultiplier, eliteT));
 						summonTimer = summonTime;
 					}
 					
+				}
+			}
+			if(summonType != -1){
+				for(Monster summon:summons){
+					if(!summon.isAlive())
+						summons.remove(summon);
 				}
 			}
 			
@@ -334,7 +345,7 @@ public class Monster {
 	}
 	
 	int getdropamount(){
-		if(elite) return (int) ((dropamount*1.5)*lifeMultiplier);
+		if(eliteT != -1) return (int) ((dropamount*1.5)*lifeMultiplier);
 		return (int)(dropamount*lifeMultiplier);
 	}
 	

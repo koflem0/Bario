@@ -626,6 +626,7 @@ public class Client2D {
 			character.lastUpdate = 0;
 			character.invincible = msg.invincible;
 			if(character.currentSkill != -1)
+				
 			if(!msg.usingSkill && character.skillAnimation.getTime() > 50)
 				character.setSkill(-1, true);
 			
@@ -641,7 +642,7 @@ public class Client2D {
 					case Network.standR :character.setAnimation(charAnims[Network.wizstandR], msg.currentAnim); break;
 					case Network.jumpL : character.setAnimation(charAnims[Network.wizjumpL], msg.currentAnim); break;
 					case Network.jumpR :character.setAnimation(charAnims[Network.wizjumpR], msg.currentAnim); break;
-				}
+				} break;
 				}
 			}
 			if(currentChar != null && msg.id == currentChar.id) {
@@ -1552,12 +1553,12 @@ public class Client2D {
 					g.fillRect(m.x-X, m.y-5-Y, (int)(m.getAnimation().getImage().getWidth(null)*m.lifePercentage/1000), 5);
 					g.setColor(Color.WHITE);
 					g.setFont(new Font("Arial", Font.PLAIN, 13));
+					String str = "";
+					if(m.summoned) str = "SUMMON ";  
+					g.drawString(str + m.getEliteType(),m.x-X,m.y-Y-19);
 					if(m.eliteType != -1){
-						g.drawString(m.getEliteType(),m.x-X,m.y-Y-19);
 						g.setColor(Color.ORANGE);
-					} else if(m.summoned){
-						g.drawString("SUMMON",m.x-X,m.y-Y-19);
-					}
+					} 
 					
 					g.drawString("Lv"+m.lvl+" "+m.getName(),m.x-X,m.y-Y-9);
 					g.setColor(Color.WHITE);
