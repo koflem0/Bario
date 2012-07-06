@@ -893,21 +893,11 @@ public class Server2D extends JFrame implements WindowListener {
 			Vector<Monster> monsters = new Vector<Monster>(map.getMonsters());
 			for (int i = 0; i < monsters.size(); i++) {
 				Monster monster = monsters.get(i);
-				if (monster.isAlive() && proj.isActive() && proj.getArea().intersects(monster.getArea())) {
-					if (proj.skill.skill == Skill.ExplosiveArrow) {
-						int x = (int) proj.x + 140;
-						if (proj.skill.cLeft)
-							x = (int) proj.x - 160;
-						add(proj.skill.skillEffect = new Effect(new Point(x, (int) proj.y - 15), Network.EXPLOARROW, 200, map.map));
-						proj.skill.hit(0);
-					} else
-						damageMonster(proj.skill.c, monster, proj.skill.c.getDamage(monster, proj.skill.skillData.dmgMult[proj.number]),
-								proj.skill.skillData.KBSpeed[proj.number]);
-					RemoveProjectile update = new RemoveProjectile();
-					update.id = proj.id;
-					sendToAllOnMap(map.map, update, false);
-					proj.delete();
-					return;
+				projectileCollision(proj, monster);
+				if(monster.summonType != -1){
+					for(int j = 0; j < monster.summons.size(); i++){
+						projectileCollision(proj, monster.summons.get(i));
+					}
 				}
 			}
 			Vector<Wall> walls = new Vector<Wall>(map.getWalls());
@@ -919,6 +909,25 @@ public class Server2D extends JFrame implements WindowListener {
 					proj.delete();
 					return;
 				}
+			}
+		}
+		
+		void projectileCollision(Projectile proj, Monster monster){
+			if (monster.isAlive() && proj.isActive() && proj.getArea().intersects(monster.getArea())) {
+				if (proj.skill.skill == Skill.ExplosiveArrow) {
+					int x = (int) proj.x + 140;
+					if (proj.skill.cLeft)
+						x = (int) proj.x - 160;
+					add(proj.skill.skillEffect = new Effect(new Point(x, (int) proj.y - 15), Network.EXPLOARROW, 200, proj.map));
+					proj.skill.hit(0);
+				} else
+					damageMonster(proj.skill.c, monster, proj.skill.c.getDamage(monster, proj.skill.skillData.dmgMult[proj.number]),
+							proj.skill.skillData.KBSpeed[proj.number]);
+				RemoveProjectile update = new RemoveProjectile();
+				update.id = proj.id;
+				sendToAllOnMap(proj.map, update, false);
+				proj.delete();
+				return;
 			}
 		}
 
