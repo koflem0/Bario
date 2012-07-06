@@ -46,19 +46,15 @@ public class Animation {
 	
 	//change l'image selon le temps écoulé
 	public synchronized void update(long timePassed){
-		if(scenes.size() > 1){
-			movieTime += timePassed;
-			if(movieTime >= totalTime) start();
-			
-			while(movieTime > getScene(sceneIndex).endTime) sceneIndex++;
-		}
-	}
-	
-	public synchronized void update(){
-		if(scenes.size() > 1){
+		movieTime += timePassed;
 		if(movieTime >= totalTime) start();
 		while(movieTime > getScene(sceneIndex).endTime) sceneIndex++;
 	}
+	
+	public synchronized void update(){
+		if(movieTime >= totalTime) start();
+		while(movieTime > getScene(sceneIndex).endTime) sceneIndex++;
+	
 	}
 	
 	//retourne l'image actuelle

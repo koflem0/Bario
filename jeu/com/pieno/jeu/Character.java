@@ -322,7 +322,7 @@ public class Character {
 				skills[skillKey].activate();
 			}
 		}
-		if(skillKey == -1 || skillKey !=currentSkill)
+		if(skillKey == -1 || skillKey != currentSkill)
 		if(currentSkill!=-1 && !skills[currentSkill].isActive())
 			currentSkill = -1;
 		

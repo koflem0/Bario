@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 public class CharacterAnimation {
 	String name, map;
 	int x, y, classe, life = 1, maxLife = 1, mana = 1, maxMana = 1, blinkCount = 0, currentSkill = -1, skillx=0, skilly=0, lastUpdate = 0, currentAnim = 0;
-	boolean invincible = false, blink = false, alive = true;
+	boolean invincible = false, blink = false, alive = true, skillFinished = true;
 	Animation skillAnimation, a;
 	
 	public CharacterAnimation(){
@@ -128,10 +128,10 @@ public class CharacterAnimation {
 		case Skill.ExplosiveArrow:
 			if(facingLeft){
 			Image walkleft1 = newImage("/walkleft1.png");
-			a.addScene(walkleft1, 200);
+			a.addScene(walkleft1, 400);
 			} else {
 			Image walkright1 = newImage("/walkright1.png");
-			a.addScene(walkright1, 200);
+			a.addScene(walkright1, 400);
 			}
 			break;
 		case Skill.FireBall:
@@ -139,21 +139,23 @@ public class CharacterAnimation {
 		case Skill.Explosion:
 			if(facingLeft){
 			Image wizStandL = newImage("/bobwalkwizzardL1.png");
-			a.addScene(wizStandL, 200);
+			a.addScene(wizStandL, 400);
 			} else {
 			Image wizStandR = newImage("/bobwalkwizzardR1.png");
-			a.addScene(wizStandR, 200);
+			a.addScene(wizStandR, 400);
 			}
 			break;
 		}
-		if(a!=null)
+		if(a!=null){
 		a.start();
+		skillFinished = false;
+		}
 		skillAnimation = a;
 		currentSkill = skill;
 	}
 	
 	public void setAnimation(Animation a, int animation){
-		this.a = a;
+		this.a = new Animation(a);
 		currentAnim = animation;
 		this.a.start();
 	}
@@ -162,8 +164,11 @@ public class CharacterAnimation {
 	public void update(long timePassed){
 		if(getAnimation()!=null)
 		getAnimation().update(timePassed);
+		if(skillAnimation != null)
+			if(skillAnimation.getTime() > skillAnimation.getTotalTime()*2/3)
+				skillFinished = true;
 		lastUpdate+=timePassed;
-		if(lastUpdate > 200){
+		if(lastUpdate > 800){
 			alive = false;
 		}
 	}

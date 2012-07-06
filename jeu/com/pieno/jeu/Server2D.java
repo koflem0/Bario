@@ -1059,8 +1059,14 @@ public class Server2D extends JFrame implements WindowListener {
 				c.vy = -0.6d;
 				c.canMove = false;
 			}
+			if(!c.alive) {
+				AddExp exp = new AddExp();
+				exp.exp = c.exp;
+				exp.lvl = c.lvl;
+				server.sendToTCP(c.connection, exp);
+			} else
 			c.setInvincible(1000);
-
+			
 			DamageText update = new DamageText();
 			update.dmg = dmg;
 			update.x = c.getX() + c.getWidth() / 3;
@@ -1383,7 +1389,7 @@ public class Server2D extends JFrame implements WindowListener {
 
 		int skill;
 
-		private int skillSlot;
+		int skillSlot;
 
 		private boolean active = false;
 		private long totalTime = 0;
