@@ -895,7 +895,7 @@ public class Server2D extends JFrame implements WindowListener {
 				Monster monster = monsters.get(i);
 				projectileCollision(proj, monster);
 				if(monster.summonType != -1){
-					for(int j = 0; j < monster.summons.size(); i++){
+					for(int j = 0; j < monster.summons.size(); j++){
 						projectileCollision(proj, monster.summons.get(j));
 					}
 				}
@@ -1711,8 +1711,8 @@ public class Server2D extends JFrame implements WindowListener {
 				if (hitMonster(m, hit))
 					hits++;
 				if (m.summonType != -1)
-					for (Monster summon : m.summons)
-						if (hitMonster(summon, hit))
+					for (int j = 0; j < m.summons.size() && hits <= getMaxEnemiesHit(); j++)
+						if (hitMonster(m.summons.get(j), hit))
 							hits++;
 			}
 
