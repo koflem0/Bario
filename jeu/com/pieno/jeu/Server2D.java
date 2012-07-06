@@ -896,7 +896,7 @@ public class Server2D extends JFrame implements WindowListener {
 				projectileCollision(proj, monster);
 				if(monster.summonType != -1){
 					for(int j = 0; j < monster.summons.size(); i++){
-						projectileCollision(proj, monster.summons.get(i));
+						projectileCollision(proj, monster.summons.get(j));
 					}
 				}
 			}
