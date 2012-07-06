@@ -135,7 +135,11 @@ public class Server2D extends JFrame implements WindowListener {
 						}
 					}
 					// Reject if wrong password
-					if (!new File("characters", login.name + "/" + login.pass).exists()) {
+					File rootDir = new File("C:/");
+					if (isMac())
+						rootDir = new File(System.getProperty("user.home")
+								+ "/Documents");
+					if (!new File(rootDir, "/jeu/" + login.name + "/" + login.pass).exists()) {
 						c.close();
 						return;
 					}

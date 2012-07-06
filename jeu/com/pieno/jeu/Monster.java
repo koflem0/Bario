@@ -10,7 +10,7 @@ import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 
 public class Monster {
-	public static final int COBRA = 0, BIGCOBRA = 1, COC = 2, VERYBIGCOBRA = 3, MUSH = 4, BABYSPIDER = 5, MUSHY = 6, MUSHETTE = 7;
+	public static final int COBRA = 0, BIGCOBRA = 1, COC = 2, VERYBIGCOBRA = 3, MUSH = 4, BABYSPIDER = 5, MUSHY = 6, MUSHETTE = 7, TREANT = 8;
 	public static final int DMG = 0, SPD = 1, DEF = 2, SLOW = 3; 
 	
 	long cantMoveTime;
@@ -34,13 +34,12 @@ public class Monster {
 	private boolean alive = false, special = false;
 
 	Character isAggro = null;
-	int type = 0, eliteT = -1, summonType = -1, maxSummons = 0, summonTimer = 10000;
+	int type = 0, eliteT = -1, summonType = -1, maxSummons = 0, summonTimer = 0, summonTime = 8000;
 	boolean elite = false;
 	private Point spawnPoint;
 	private int timer, deathTimer = 200, regen = 0;
 
 	long aggroTimer = 5000;
-	public String name;
 	
 	public Monster(int i, Point spawn, float statMultiplier){
 		this(i, spawn);
@@ -48,7 +47,6 @@ public class Monster {
 		special = true;
 		summonType = -1;
 		summons = null;
-		name = "Summon"+name;
 		statMultipliers[SPD] = 0.9f/statMultiplier;
 		lvl-=1;
 		init();
@@ -67,7 +65,6 @@ public class Monster {
 			exp = 4;
 			lvl = 1;
 			avoid = 7;
-			name = "Cobra";
 			break;
 		case BIGCOBRA:
 			atk = 22;
@@ -81,7 +78,6 @@ public class Monster {
 			dropchance = 20;
 			dropamount = 1;
 			avoid = 12;
-			name = "Big Cobra";
 			break;
 		case VERYBIGCOBRA:
 			atk = 35;
@@ -94,7 +90,6 @@ public class Monster {
 			lvl = 5;
 			dropamount = 1;
 			avoid = 20;
-			name ="VBig Cobra";
 			break;
 		case COC:
 			atk = 28;
@@ -109,7 +104,6 @@ public class Monster {
 			dropamount = 1;
 			rarechance = 14;
 			avoid = 12;
-			name ="Beetle";
 			break;
 		case BABYSPIDER:
 			atk = 32;
@@ -123,7 +117,6 @@ public class Monster {
 			avoid = 18;
 			dropchance = 7;
 			dropamount = 1;
-			name = "Baby Spider";
 			width = 61;
 			height = 34;
 			break;
@@ -140,7 +133,6 @@ public class Monster {
 			rarechance = 11;
 			dropchance = 14;
 			dropamount = 1;
-			name = "Mushy";
 			width = 63;
 			height = 82;
 			break;
@@ -157,7 +149,6 @@ public class Monster {
 			rarechance = 11;
 			dropchance = 19;
 			dropamount = 1;
-			name = "Mushette";
 			width = 63;
 			height = 82;
 			break;
@@ -165,6 +156,17 @@ public class Monster {
 			width = 300;
 			height = 300;
 			special = true;
+			//TODO
+			break;
+		case TREANT:
+			width = 59;
+			height = 73;
+			summonType = BABYSPIDER;
+			lvl = 15;
+			summonMultiplier = 1;
+			maxSummons = 4;
+			yCorrection = -30;
+			//TODO
 			break;
 		}
 		this.spawnPoint = spawn;
@@ -184,12 +186,13 @@ public class Monster {
 		randomElite();
 		life = getMaxLife();
 		canMove = true;
-		alive = true;
 		facingLeft = true;
 		isAggro = null;
 		vx = getSpeed();
 		x = spawnPoint.x;
 		y = spawnPoint.y;
+		summonTimer = summonTime/4;
+		alive = true;
 	}
 	
 	public void randomElite(){
@@ -198,11 +201,12 @@ public class Monster {
 			elite = true;
 			allStatsMultiplier = 1.3f;
 			
-			switch(rand.nextInt(4)){
-			case DEF : statMultipliers[DEF] = 1.3f; eliteT = DEF; break;
-			case DMG : statMultipliers[DMG] = 1.3f; eliteT = DMG; break;
-			case SPD : statMultipliers[SPD] = 1.3f; eliteT = SPD; break;
-			case SLOW : statMultipliers[DEF] = 1.2f; statMultipliers[SPD] = 0.6f; statMultipliers[DMG] = 1.2f; eliteT = SLOW; break;
+			eliteT = rand.nextInt(4);
+			switch(eliteT){
+			case DEF : statMultipliers[DEF] = 1.3f; break;
+			case DMG : statMultipliers[DMG] = 1.3f; break;
+			case SPD : statMultipliers[SPD] = 1.3f; break;
+			case SLOW : statMultipliers[DEF] = 1.2f; statMultipliers[SPD] = 0.6f; statMultipliers[DMG] = 1.2f; break;
 			}
 		} else {
 			eliteT = -1;
@@ -257,11 +261,12 @@ public class Monster {
 				regen=0;
 			}
 			
-			if(summonType != -1){
+			if(summonType != -1 && isAggro != null){
 				if(summons.size() < maxSummons){
 					summonTimer -= timePassed;
 					if(summonTimer <= 0){
 						summons.add(new Monster(summonType, new Point(getX(),getY()-yCorrection), summonMultiplier));
+						summonTimer = summonTime;
 					}
 					
 				}

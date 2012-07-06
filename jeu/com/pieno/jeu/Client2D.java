@@ -594,6 +594,7 @@ public class Client2D {
 			if(monsters == null) monsters = new HashMap<Integer, MonsterAnimation>();
 			if(!monsters.containsKey(mon.id) || monsters.get(mon.id).type != mon.type){
 				MonsterAnimation mona = new MonsterAnimation(mon.type);
+				if(mon.id >= 100) mona.summoned = true;
 				monsters.put(mon.id, mona);
 			}
 			monsters.get(mon.id).lastUpdate = 0;
@@ -1554,7 +1555,10 @@ public class Client2D {
 					if(m.eliteType != -1){
 						g.drawString(m.getEliteType(),m.x-X,m.y-Y-19);
 						g.setColor(Color.ORANGE);
+					} else if(m.summoned){
+						g.drawString("SUMMON",m.x-X,m.y-Y-19);
 					}
+					
 					g.drawString("Lv"+m.lvl+" "+m.getName(),m.x-X,m.y-Y-9);
 					g.setColor(Color.WHITE);
 				}

@@ -8,11 +8,12 @@ import javax.swing.ImageIcon;
 
 public class MonsterAnimation{
 	int x, y, type, eliteType, lvl;
-	int lastUpdate = 0;
+	int lastUpdate = 0, frames = 0;
 	int lifePercentage;
-	private Image[] monstreD = new Image[12],monstreG = new Image[12];
+	private Image[] monstreD,monstreG;
 	private Image monstreHitD, monstreHitL;
 	Animation hitLeft, hitRight, left, right;
+	boolean summoned = false;
 	boolean canMove, facingLeft, alive = false;
 	
 	public MonsterAnimation(int type){
@@ -22,80 +23,51 @@ public class MonsterAnimation{
 	}
 	
 	// load les images du monstre
-	public void loadpics(int i) {
-		switch (i) {
+	public void loadpics(int y) {
+		String name = "";
+		switch (y) {
 		case Monster.COBRA:
-			monstreD[1] = newImage("/cobra1D.png");
-			monstreD[2] = newImage("/cobra2D.png");
-			monstreG[1] = newImage("/cobra1G.png");
-			monstreG[2] = newImage("/cobra2G.png");
+			name = "cobra";
+			frames = 2;
 			break;
 		case Monster.BIGCOBRA:
-			monstreD[1] = newImage("/bigcobra1D.png");
-			monstreD[2] = newImage("/bigcobra2D.png");
-			monstreG[1] = newImage("/bigcobra1G.png");
-			monstreG[2] = newImage("/bigcobra2G.png");
+			name = "bigcobra";
+			frames = 2;
 			break;
 		case Monster.VERYBIGCOBRA:
-			monstreD[1] = newImage("/verybigcobra1D.png");
-			monstreD[2] = newImage("/verybigcobra2D.png");
-			monstreG[1] = newImage("/verybigcobra1G.png");
-			monstreG[2] = newImage("/verybigcobra2G.png");
+			name = "verybigcobra";
+			frames = 2;
 			break;
 		case Monster.COC:
-			monstreD[1] = newImage("/coc1D.png");
-			monstreD[2] = newImage("/coc2D.png");
-			monstreD[3] = newImage("/coc3D.png");
-			monstreD[4] = newImage("/coc4D.png");
-			monstreG[1] = newImage("/coc1G.png");
-			monstreG[2] = newImage("/coc2G.png");
-			monstreG[3] = newImage("/coc3G.png");
-			monstreG[4] = newImage("/coc4G.png");
+			name = "coc";
+			frames = 4;
 			break;
 		case Monster.MUSH:
-			monstreD[0] = newImage("/mushjumpR.png");
-			monstreD[1] = newImage("/mushjumpR1.png");
-			monstreD[2] = newImage("/mushjumpR2.png");
-			monstreD[3] = newImage("/mushjumpR3.png");
-			monstreD[4] = newImage("/mushjumpR4.png");
-			monstreD[5] = newImage("/mushjumpR5.png");
-			monstreD[6] = newImage("/mushjumpR6.png");
-			monstreD[7] = newImage("/mushjumpR7.png");
-			monstreD[8] = newImage("/mushjumpR8.png");
-			monstreD[9] = newImage("/mushjumpR9.png");
-			monstreG[0] = newImage("/mushjumpL.png");
-			monstreG[1] = newImage("/mushjumpL1.png");
-			monstreG[2] = newImage("/mushjumpL2.png");
-			monstreG[3] = newImage("/mushjumpL3.png");
-			monstreG[4] = newImage("/mushjumpL4.png");
-			monstreG[5] = newImage("/mushjumpL5.png");
-			monstreG[6] = newImage("/mushjumpL6.png");
-			monstreG[7] = newImage("/mushjumpL7.png");
-			monstreG[8] = newImage("/mushjumpL8.png");
-			monstreG[9] = newImage("/mushjumpL9.png");
+			name = "mushjump";
+			frames = 10;
 			break;
 		case Monster.MUSHETTE:
-			monstreD[1] = newImage("/MUSHETTE1D.png");
-			monstreD[2] = newImage("/MUSHETTE2D.png");
-			monstreD[3] = newImage("/MUSHETTE3D.png");
-			monstreG[1] = newImage("/MUSHETTE1G.png");
-			monstreG[2] = newImage("/MUSHETTE2G.png");
-			monstreG[3] = newImage("/MUSHETTE3G.png");
+			name = "MUSHETTE";
+			frames = 3;
 			break;
 		case Monster.BABYSPIDER:
-			monstreG[0] = newImage("/babyspider1G.png");
-			monstreG[1] = newImage("/babyspider2G.png");
-			monstreD[0] = newImage("/babyspider1D.png");
-			monstreD[1] = newImage("/babyspider2D.png");
+			name = "babyspider";
+			frames = 2;
 			break;
 		case Monster.MUSHY:
-			monstreD[1] = newImage("/MUSHY1D.png");
-			monstreD[2] = newImage("/MUSHY2D.png");
-			monstreD[3] = newImage("/MUSHY3D.png");
-			monstreG[1] = newImage("/MUSHY1G.png");
-			monstreG[2] = newImage("/MUSHY2G.png");
-			monstreG[3] = newImage("/MUSHY3G.png");
+			name = "MUSHY";
+			frames = 3;
 			break;
+		case Monster.TREANT:
+			name = "TREANT";
+			frames = 4;
+		}
+		
+		monstreD = new Image[frames+1];
+		monstreG = new Image[frames+1];
+		for(int i = 1; i <= frames; i++){
+			monstreD[i] = newImage("/"+name+i+"D.png");
+			monstreG[i] = newImage("/"+name+i+"G.png");
 		}
 	}
 	
@@ -130,7 +102,6 @@ public class MonsterAnimation{
 			hitRight.addScene(monstreD[1],200);
 			break;
 		case Monster.MUSH:
-			right.addScene(monstreD[0], 50);
 			right.addScene(monstreD[1], 50);
 			right.addScene(monstreD[2], 50);
 			right.addScene(monstreD[3], 50);
@@ -140,7 +111,7 @@ public class MonsterAnimation{
 			right.addScene(monstreD[7], 50);
 			right.addScene(monstreD[8], 50);
 			right.addScene(monstreD[9], 50);
-			left.addScene(monstreG[0], 50);
+			right.addScene(monstreD[10], 50);
 			left.addScene(monstreG[1], 50);
 			left.addScene(monstreG[2], 50);
 			left.addScene(monstreG[3], 50);
@@ -150,16 +121,17 @@ public class MonsterAnimation{
 			left.addScene(monstreG[7], 50);
 			left.addScene(monstreG[8], 50);
 			left.addScene(monstreG[9], 50);
+			left.addScene(monstreG[10], 50);
 			hitLeft.addScene(monstreG[5], 200);
 			hitRight.addScene(monstreD[5], 200);
 			break;
 		case Monster.BABYSPIDER:
-			right.addScene(monstreD[0], 200);
 			right.addScene(monstreD[1], 200);
-			left.addScene(monstreG[0], 200);
+			right.addScene(monstreD[2], 200);
 			left.addScene(monstreG[1], 200);
-			hitLeft.addScene(monstreG[0], 200);
-			hitRight.addScene(monstreD[0], 200);
+			left.addScene(monstreG[2], 200);
+			hitLeft.addScene(monstreG[1], 200);
+			hitRight.addScene(monstreD[1], 200);
 			break;
 		case Monster.MUSHY:
 		case Monster.MUSHETTE:
@@ -174,13 +146,23 @@ public class MonsterAnimation{
 			hitLeft.addScene(monstreG[1], 200);
 			hitRight.addScene(monstreD[1], 200);
 			break;
+		case Monster.TREANT:
+			right.addScene(monstreD[1], 120);
+			right.addScene(monstreD[2], 120);
+			right.addScene(monstreD[3], 120);
+			right.addScene(monstreD[4], 120);
+			left.addScene(monstreG[1], 120);
+			left.addScene(monstreG[2], 120);
+			left.addScene(monstreG[3], 120);
+			left.addScene(monstreG[4], 120);
+			break;
 		}
 	}
 	
 	public void update(long timePassed){
 		getAnimation().update(timePassed);
 		lastUpdate+= timePassed;
-		if(lastUpdate>=700) alive = false;
+		if(lastUpdate>=800) alive = false;
 	}
 	
 	public String getName(){
@@ -193,6 +175,7 @@ public class MonsterAnimation{
 		case Monster.MUSHY: return "Mushy";
 		case Monster.MUSH: return "Big Mush";
 		case Monster.MUSHETTE: return"Mushette";
+		case Monster.TREANT: return "Treant";
 		}
 		return"";
 	}
