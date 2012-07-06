@@ -34,7 +34,7 @@ public class Monster {
 	private boolean alive = false, special = false;
 
 	Character isAggro = null;
-	int type = 0, eliteT = -1, summonType = -1, maxSummons = 1, summonTimer = 0, summonTime = 8000;
+	int type = 0, eliteT = -1, summonType = -1, maxSummons = 1, summonTimer = 0, summonTime = 6000;
 	private Point spawnPoint;
 	private int timer, deathTimer = 200, regen = 0;
 
@@ -202,7 +202,7 @@ public class Monster {
 		vx = getSpeed();
 		x = spawnPoint.x;
 		y = spawnPoint.y;
-		summonTimer = summonTime/4;
+		summonTimer = summonTime/5;
 		alive = true;
 	}
 	
