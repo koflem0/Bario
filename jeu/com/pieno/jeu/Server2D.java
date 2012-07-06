@@ -1081,6 +1081,7 @@ public class Server2D extends JFrame implements WindowListener {
 			int dmast = rand.nextInt(100 - m.getMastery()) + m.getMastery();
 			int dmg = m.getAtk();
 			dmg = dmg * dmast / 100;
+			if(c.classe == Character.FIGHTER) dmg -= dmg*3/10;
 			dmg = (int) (dmg * (1 - c.defense / (c.defense + 22 * Math.pow(1.1, m.getLevel()))));
 			if (dmg <= 0)
 				dmg = 1;

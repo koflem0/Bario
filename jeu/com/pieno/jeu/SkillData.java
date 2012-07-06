@@ -35,8 +35,8 @@ public class SkillData {
 		manaUsed = -2;
 		dmgMult[0] = dmgMult[1] = dmgMult[2] = 0.44f + 0.04f * lvl;
 		maxEnemiesHit = 1;
-		KBSpeed[0] = KBSpeed[1] = 0.05f;
-		KBSpeed[2] = 0.10f;
+		KBSpeed[0] = KBSpeed[1] = 0.06f;
+		KBSpeed[2] = 0.12f;
 		skillTime = 500;
 		hitTime[0] = 140;
 		hitTime[1] = 270;
