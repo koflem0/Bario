@@ -34,7 +34,7 @@ public class Monster {
 	private boolean alive = false, special = false;
 
 	Character isAggro = null;
-	int type = 0, eliteT = -1, summonType = -1, maxSummons = 0, summonTimer = 0, summonTime = 8000;
+	int type = 0, eliteT = -1, summonType = -1, maxSummons = 1, summonTimer = 0, summonTime = 8000;
 	private Point spawnPoint;
 	private int timer, deathTimer = 200, regen = 0;
 
@@ -47,9 +47,9 @@ public class Monster {
 		summonType = -1;
 		summons = null;
 		timer = 60000;
-		statMultipliers[SPD] = 0.9f/statMultiplier;
 		lvl-=1;
 		generateElite(eliteType);
+		statMultipliers[SPD] = 0.9f/statMultiplier * statMultipliers[SPD];
 		init();
 	}
 	
@@ -209,13 +209,13 @@ public class Monster {
 	public void generateElite(int type){
 		eliteT = type;
 		if(type == -1){
-			allStatsMultiplier = 1;
-			for(int i = 0; i < 10; i++){
+			allStatsMultiplier = 1 * allStatsMultiplier;
+			for(int i = 0; i < 10; i++)
 				statMultipliers[i] = 1;
-			}
+			
 			return;
 		}
-		allStatsMultiplier = 1.3f;
+		allStatsMultiplier = 1.3f * allStatsMultiplier;
 		switch(eliteT){
 		case DEF : statMultipliers[DEF] = 1.3f; break;
 		case DMG : statMultipliers[DMG] = 1.3f; break;
@@ -225,6 +225,8 @@ public class Monster {
 	}
 	
 	public void randomElite(){
+		allStatsMultiplier = 1;
+		
 		Random rand = new Random();
 		if(1 > rand.nextInt(10)){
 			generateElite(rand.nextInt(4));
@@ -270,8 +272,8 @@ public class Monster {
 	public void update(long timePassed) {
 		if (alive) {
 			regen+= timePassed;
-			if(regen >= 40000/maxLife+200){
-				if(life < maxLife)
+			if(regen >= 40000/getMaxLife()+200){
+				if(life < getMaxLife())
 				life++;
 				regen=0;
 			}
@@ -281,6 +283,11 @@ public class Monster {
 					summonTimer -= timePassed;
 					if(summonTimer <= 0){
 						summons.add(new Monster(summonType, new Point(getX(),getY()-yCorrection), summonMultiplier, eliteT));
+						if(isAggro.x +isAggro.getWidth()/2 > x+width/2) {
+							Monster summon = summons.get(summons.size()-1);
+							summon.vx = -summon.vx;
+							summon.setFacingLeft(false);
+						}
 						summonTimer = summonTime;
 					}
 					
