@@ -20,7 +20,7 @@ public class Monster {
 	
 	float life, maxLife;
 
-	private int exp, lvl, dropchance = 13, rarechance = 8, dropamount = 1;
+	private int exp, lvl, dropchance = 13, rarechance = 9, dropamount = 1;
 
 	public int avoid, width = 100, height = 50, yCorrection = 0;
 	float vx = 0, vy = 0;
@@ -63,7 +63,7 @@ public class Monster {
 			spd = -0.240f;
 			maxLife = 13;
 			timer = 12000;
-			exp = 4;
+			exp = 5;
 			lvl = 1;
 			avoid = 7;
 			break;
@@ -74,20 +74,20 @@ public class Monster {
 			spd = -0.35f;
 			maxLife = 25;
 			timer = 30000;
-			exp = 9;
+			exp = 12;
 			lvl = 3;
 			dropchance = 20;
 			dropamount = 1;
 			avoid = 12;
 			break;
 		case VERYBIGCOBRA:
-			atk = 35;
+			atk = 28;
 			def = 8;
 			mastery = 50;
 			spd = -0.40f;
 			maxLife = 41;
 			timer = 30000;
-			exp = 15;
+			exp = 20;
 			lvl = 5;
 			dropamount = 1;
 			avoid = 20;
@@ -113,7 +113,7 @@ public class Monster {
 			spd = -0.47f;
 			maxLife = 42;
 			timer = 20000;
-			exp = 12;
+			exp = 17;
 			lvl = 8;
 			avoid = 18;
 			dropchance = 7;
@@ -122,7 +122,7 @@ public class Monster {
 			height = 34;
 			break;
 		case MUSHY:
-			atk = 58;
+			atk = 48;
 			def = 24;
 			mastery = 50;
 			spd = -0.27f;
@@ -138,7 +138,7 @@ public class Monster {
 			height = 82;
 			break;
 		case MUSHETTE:
-			atk = 70;
+			atk = 60;
 			def = 10;
 			mastery = 50;
 			spd = -0.37f;
@@ -166,7 +166,7 @@ public class Monster {
 			spd = -0.17f;
 			maxLife = 300;
 			timer = 45000;
-			exp = 110;
+			exp = 120;
 			avoid = 5;
 			rarechance = 13;
 			dropchance = 20;
