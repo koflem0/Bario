@@ -162,7 +162,7 @@ public class Monster {
 			atk = 100;
 			def = 20;
 			mastery = 50;
-			spd = -0.27f;
+			spd = -0.17f;
 			maxLife = 300;
 			timer = 45000;
 			exp = 110;
