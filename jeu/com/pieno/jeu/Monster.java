@@ -159,6 +159,17 @@ public class Monster {
 			//TODO
 			break;
 		case TREANT:
+			atk = 100;
+			def = 20;
+			mastery = 50;
+			spd = -0.27f;
+			maxLife = 300;
+			timer = 45000;
+			exp = 110;
+			avoid = 5;
+			rarechance = 13;
+			dropchance = 20;
+			dropamount = 1;
 			width = 59;
 			height = 73;
 			summonType = BABYSPIDER;
@@ -166,7 +177,6 @@ public class Monster {
 			summonMultiplier = 1;
 			maxSummons = 4;
 			yCorrection = -30;
-			//TODO
 			break;
 		}
 		this.spawnPoint = spawn;
