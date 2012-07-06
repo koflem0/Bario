@@ -625,9 +625,8 @@ public class Client2D {
 			character.maxMana = msg.maxMana;
 			character.lastUpdate = 0;
 			character.invincible = msg.invincible;
-			if(character.currentSkill != -1)
-				
-			if(!msg.usingSkill && character.skillAnimation.getTime() > 50)
+			
+			if(!msg.usingSkill && (character.skillAnimation == null || character.skillAnimation.getTime() > 50))
 				character.setSkill(-1, true);
 			
 			if(character.currentAnim != msg.currentAnim){

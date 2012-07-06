@@ -128,10 +128,10 @@ public class CharacterAnimation {
 		case Skill.ExplosiveArrow:
 			if(facingLeft){
 			Image walkleft1 = newImage("/walkleft1.png");
-			a.addScene(walkleft1, 200);
+			a.addScene(walkleft1, 400);
 			} else {
 			Image walkright1 = newImage("/walkright1.png");
-			a.addScene(walkright1, 200);
+			a.addScene(walkright1, 400);
 			}
 			break;
 		case Skill.FireBall:
@@ -139,10 +139,10 @@ public class CharacterAnimation {
 		case Skill.Explosion:
 			if(facingLeft){
 			Image wizStandL = newImage("/bobwalkwizzardL1.png");
-			a.addScene(wizStandL, 200);
+			a.addScene(wizStandL, 400);
 			} else {
 			Image wizStandR = newImage("/bobwalkwizzardR1.png");
-			a.addScene(wizStandR, 200);
+			a.addScene(wizStandR, 400);
 			}
 			break;
 		}
@@ -153,7 +153,7 @@ public class CharacterAnimation {
 	}
 	
 	public void setAnimation(Animation a, int animation){
-		this.a = a;
+		this.a = new Animation(a);
 		currentAnim = animation;
 		this.a.start();
 	}
