@@ -266,7 +266,7 @@ public class Client2D {
 			host = client.discoverHost(Network.port+1, 1000).getHostAddress();
 		} catch (Exception e){
 			try {
-				Server2D.start();
+				new Server2D();
 				host = client.discoverHost(Network.port+1, 1500).getHostAddress();
 			} catch (Exception e1) {
 				try{

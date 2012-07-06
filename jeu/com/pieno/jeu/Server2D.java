@@ -65,10 +65,6 @@ public class Server2D extends JFrame implements WindowListener {
 	public DefaultListModel connectionsList = new DefaultListModel();
 	
 	public static void main(String[] args) throws IOException {
-		start();
-	}
-	
-	public static void start() throws IOException {
 		Log.set(Log.LEVEL_INFO);
 		new Server2D();
 	}
@@ -99,7 +95,11 @@ public class Server2D extends JFrame implements WindowListener {
 					AuthResponse r = new AuthResponse();
 					;
 
-					File path = new File("characters", auth.name);
+					File rootDir = new File("C:/");
+					if (isMac())
+						rootDir = new File(System.getProperty("user.home")
+								+ "/Documents");
+					File path = new File(rootDir, "/jeu/"+auth.name);
 					if (!path.exists()) {
 						new File(path, auth.pass).mkdirs();
 					}
@@ -330,8 +330,12 @@ public class Server2D extends JFrame implements WindowListener {
 
 				if (object instanceof DeleteSave) {
 					DeleteSave delete = (DeleteSave) object;
-					File file = new File("characters", delete.name + "/save" + delete.slot + ".sav");
-					File backup = new File("characters", delete.name + "/backup" + delete.slot);
+					File rootDir = new File("C:/");
+					if (isMac())
+						rootDir = new File(System.getProperty("user.home")
+								+ "/Documents");
+					File file = new File(rootDir, "/jeu/" +delete.name + "/save" + delete.slot + ".sav");
+					File backup = new File(rootDir, "/jeu/"+delete.name + "/backup" + delete.slot);
 					if (backup.exists())
 						backup.delete();
 					file.renameTo(backup);

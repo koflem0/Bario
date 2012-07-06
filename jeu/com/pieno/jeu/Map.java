@@ -6,9 +6,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -29,13 +33,14 @@ import javax.swing.ImageIcon;
 		public Map(String map) {
 			this.map = map;
 			int x,y,width,height;
-			File mapFile = new File("jeu/map", map.substring(0, map.indexOf("."))+".map");
+			URL mapUrl = getClass().getResource("/map/"+map.substring(0, map.indexOf("."))+".map");
 			background = newImage("/"+map);
 			Xlimit = background.getWidth(null);
 			Ylimit = background.getHeight(null);
 			String line;
 			try {
-				BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(mapFile)));
+				URLConnection uc = mapUrl.openConnection();
+				BufferedReader input = new BufferedReader(new InputStreamReader(uc.getInputStream()));
 				while((line = input.readLine())!=null){
 					StringTokenizer bob = new StringTokenizer(line);
 					switch(bob.nextToken().toLowerCase().charAt(0)){
@@ -79,6 +84,7 @@ import javax.swing.ImageIcon;
 					}
 				}
 				limitWalls();
+				input.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
