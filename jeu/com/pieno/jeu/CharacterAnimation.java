@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 public class CharacterAnimation {
 	String name, map;
 	int x, y, classe, life = 1, maxLife = 1, mana = 1, maxMana = 1, blinkCount = 0, currentSkill = -1, skillx=0, skilly=0, lastUpdate = 0, currentAnim = 0;
-	boolean invincible = false, blink = false, alive = true;
+	boolean invincible = false, blink = false, alive = true, skillFinished = true;
 	Animation skillAnimation, a;
 	
 	public CharacterAnimation(){
@@ -146,8 +146,10 @@ public class CharacterAnimation {
 			}
 			break;
 		}
-		if(a!=null)
+		if(a!=null){
 		a.start();
+		skillFinished = false;
+		}
 		skillAnimation = a;
 		currentSkill = skill;
 	}
@@ -162,8 +164,11 @@ public class CharacterAnimation {
 	public void update(long timePassed){
 		if(getAnimation()!=null)
 		getAnimation().update(timePassed);
+		if(skillAnimation != null)
+			if(skillAnimation.getTime() > skillAnimation.getTotalTime()*2/3)
+				skillFinished = true;
 		lastUpdate+=timePassed;
-		if(lastUpdate > 200){
+		if(lastUpdate > 800){
 			alive = false;
 		}
 	}

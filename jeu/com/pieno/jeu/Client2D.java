@@ -626,7 +626,7 @@ public class Client2D {
 			character.lastUpdate = 0;
 			character.invincible = msg.invincible;
 			
-			if(!msg.usingSkill && (character.skillAnimation == null || character.skillAnimation.getTime() > 50))
+			if(!msg.usingSkill && character.skillFinished)
 				character.setSkill(-1, true);
 			
 			if(character.currentAnim != msg.currentAnim){
