@@ -63,7 +63,7 @@ public class Server2D extends JFrame implements WindowListener {
 	public JButton dc_btn;
 	public JList loggedIn_l;
 	public DefaultListModel connectionsList = new DefaultListModel();
-	
+
 	public static void main(String[] args) throws IOException {
 		Log.set(Log.LEVEL_INFO);
 		new Server2D();
@@ -97,9 +97,8 @@ public class Server2D extends JFrame implements WindowListener {
 
 					File rootDir = new File("C:/");
 					if (isMac())
-						rootDir = new File(System.getProperty("user.home")
-								+ "/Documents");
-					File path = new File(rootDir, "/jeu/"+auth.name);
+						rootDir = new File(System.getProperty("user.home") + "/Documents");
+					File path = new File(rootDir, "/jeu/" + auth.name);
 					if (!path.exists()) {
 						new File(path, auth.pass).mkdirs();
 					}
@@ -137,8 +136,7 @@ public class Server2D extends JFrame implements WindowListener {
 					// Reject if wrong password
 					File rootDir = new File("C:/");
 					if (isMac())
-						rootDir = new File(System.getProperty("user.home")
-								+ "/Documents");
+						rootDir = new File(System.getProperty("user.home") + "/Documents");
 					if (!new File(rootDir, "/jeu/" + login.name + "/" + login.pass).exists()) {
 						c.close();
 						return;
@@ -199,7 +197,9 @@ public class Server2D extends JFrame implements WindowListener {
 						if (switchItems.i == -1) {
 							add(new Drop(previousItem, new Point(character.getX() + rand.nextInt(70), character.getY() + 150), character.id), character.map);
 							character.inventory.delete(switchItems.previousI);
-						} else if (character.inventory.getItem(switchItems.i, switchItems.j) == null || (character.inventory.getItem(switchItems.i, switchItems.j).getSlot() == switchItems.previousI && character.inventory.getItem(switchItems.i, switchItems.j).getLvl() <= character.lvl)) {
+						} else if (character.inventory.getItem(switchItems.i, switchItems.j) == null
+								|| (character.inventory.getItem(switchItems.i, switchItems.j).getSlot() == switchItems.previousI && character.inventory.getItem(
+										switchItems.i, switchItems.j).getLvl() <= character.lvl)) {
 							character.inventory.setEquip(character.inventory.getItem(switchItems.i, switchItems.j), switchItems.previousI);
 							character.inventory.setItem(previousItem, switchItems.i, switchItems.j);
 						}
@@ -224,7 +224,8 @@ public class Server2D extends JFrame implements WindowListener {
 				if (object instanceof Pickup) {
 					Pickup pickup = (Pickup) object;
 					for (int i = 0; i < drops.get(character.map).size(); i++) {
-						if (drops.get(character.map).get(i).getArea().intersects(character.getArea()) && (drops.get(character.map).get(i).ownerID == -1 || drops.get(character.map).get(i).ownerID == character.id)) {
+						if (drops.get(character.map).get(i).getArea().intersects(character.getArea())
+								&& (drops.get(character.map).get(i).ownerID == -1 || drops.get(character.map).get(i).ownerID == character.id)) {
 							character.inventory.add(drops.get(character.map).get(i).item);
 							RemoveDrop update = new RemoveDrop();
 							update.id = drops.get(character.map).get(i).id;
@@ -336,10 +337,9 @@ public class Server2D extends JFrame implements WindowListener {
 					DeleteSave delete = (DeleteSave) object;
 					File rootDir = new File("C:/");
 					if (isMac())
-						rootDir = new File(System.getProperty("user.home")
-								+ "/Documents");
-					File file = new File(rootDir, "/jeu/" +delete.name + "/save" + delete.slot + ".sav");
-					File backup = new File(rootDir, "/jeu/"+delete.name + "/backup" + delete.slot);
+						rootDir = new File(System.getProperty("user.home") + "/Documents");
+					File file = new File(rootDir, "/jeu/" + delete.name + "/save" + delete.slot + ".sav");
+					File backup = new File(rootDir, "/jeu/" + delete.name + "/backup" + delete.slot);
 					if (backup.exists())
 						backup.delete();
 					file.renameTo(backup);
@@ -389,12 +389,12 @@ public class Server2D extends JFrame implements WindowListener {
 				if (connection.character != null) {
 					saveCharacter(connection.character);
 					loggedIn.remove(connection.character);
-
 					RemoveCharacter removeCharacter = new RemoveCharacter();
 					removeCharacter.id = connection.character.id;
 					server.sendToAllTCP(removeCharacter);
 				}
 				characterConnections.remove(c);
+				connectionsList.removeElement(c);
 			}
 		});
 		ip = InetAddress.getLocalHost().getHostAddress();
@@ -404,29 +404,25 @@ public class Server2D extends JFrame implements WindowListener {
 		PT.start();
 		ST = new SendThread();
 		ST.start();
-		
+
 		initWindow();
 	}
-	
-	void initWindow(){
-		
+
+	void initWindow() {
+
 		setTitle("Server - " + ip);
-		
+
 		dc_btn = new JButton();
 		dc_btn.setText("Disconnect");
-		dc_btn.addActionListener(new ActionListener()
-		{
+		dc_btn.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				int selected = loggedIn_l.getSelectedIndex();
 
-				if (selected > -1 && characterConnections.size() > selected)
-				{
+				if (selected > -1 && characterConnections.size() > selected) {
 
-					if(characterConnections.get(selected).character != null)
-					{
+					if (characterConnections.get(selected).character != null) {
 						saveCharacter(characterConnections.get(selected).character);
 
 						RemoveCharacter removeCharacter = new RemoveCharacter();
@@ -435,10 +431,8 @@ public class Server2D extends JFrame implements WindowListener {
 						server.sendToAllTCP(removeCharacter);
 
 					}
-					
+
 					characterConnections.get(selected).close();
-					
-					
 
 				}
 
@@ -446,7 +440,7 @@ public class Server2D extends JFrame implements WindowListener {
 
 		});
 		loggedIn_l = new JList(connectionsList);
-		
+
 		pane1 = new JPanel();
 		pane1.setLayout(new GridLayout(1, 1, 1, 1));
 		pane1.add(dc_btn);
@@ -468,12 +462,12 @@ public class Server2D extends JFrame implements WindowListener {
 
 		setContentPane(content);
 		pack();
-		setSize(400,400);
+		setSize(400, 400);
 		setResizable(false);
 		setLocationRelativeTo(null);
 		addWindowListener(this);
 		setVisible(true);
-		
+
 	}
 
 	void updateInventory(Character c) {
@@ -517,9 +511,8 @@ public class Server2D extends JFrame implements WindowListener {
 		server.sendToAllTCP(addCharacter);
 		updateInventory(addCharacter.character);
 	}
-	
-	public static boolean isMac()
-	{
+
+	public static boolean isMac() {
 
 		String os = System.getProperty("os.name").toLowerCase();
 		return (!(os.indexOf("win") >= 0));
@@ -529,9 +522,7 @@ public class Server2D extends JFrame implements WindowListener {
 	boolean saveCharacter(Character character) {
 		File rootDir = new File("C:/");
 		if (isMac())
-			rootDir = new File(System.getProperty("user.home")
-					+ "/Documents");
-
+			rootDir = new File(System.getProperty("user.home") + "/Documents");
 
 		File file = new File(rootDir, "jeu/" + character.name + "/save" + character.saveSlot + ".sav");
 		file.getParentFile().mkdirs();
@@ -578,8 +569,7 @@ public class Server2D extends JFrame implements WindowListener {
 	Character loadCharacter(String name, int saveSlot) {
 		File rootDir = new File("C:/");
 		if (isMac())
-			rootDir = new File(System.getProperty("user.home")
-					+ "/Documents");
+			rootDir = new File(System.getProperty("user.home") + "/Documents");
 		File file = new File(rootDir, "jeu/" + name + "/save" + saveSlot + ".sav");
 		if (!file.exists())
 			return null;
@@ -632,16 +622,16 @@ public class Server2D extends JFrame implements WindowListener {
 	// This holds per connection state.
 	static class CharacterConnection extends Connection {
 		public Character character;
-		
-		public String toString(){
-			try{
-			InetAddress address = getRemoteAddressTCP().getAddress();
-			if(character!=null){
-				return character.toString() + " connection " + getID() + ", " + address.getHostAddress();
-			}
-			return  "No character (" + address.getHostName() +") connection "+ getID() + ", "+ address.getHostAddress();
-			} catch (Exception e){
-				return "Connection "+getID();
+
+		public String toString() {
+			try {
+				InetAddress address = getRemoteAddressTCP().getAddress();
+				if (character != null) {
+					return character.toString() + " connection " + getID() + ", " + address.getHostAddress();
+				}
+				return "No character (" + address.getHostName() + ") connection " + getID() + ", " + address.getHostAddress();
+			} catch (Exception e) {
+				return "Connection " + getID();
 			}
 		}
 	}
@@ -714,15 +704,15 @@ public class Server2D extends JFrame implements WindowListener {
 				for (int i = 0; i < map.getMonsters().size(); i++) {
 					Monster m = map.getMonsters().get(i);
 					sendMonsterData(m, map.map, i);
-					if(m.summonType != -1)
-					for(int y = 0; y < m.summons.size(); y++){
-						sendMonsterData(m.summons.get(y), map.map, 100+i*20+y);
-					}
+					if (m.summonType != -1)
+						for (int y = 0; y < m.summons.size(); y++) {
+							sendMonsterData(m.summons.get(y), map.map, 100 + i * 20 + y);
+						}
 				}
 			}
 		}
-		
-		void sendMonsterData(Monster m, String map, int id){
+
+		void sendMonsterData(Monster m, String map, int id) {
 			UpdateMonster update = new UpdateMonster();
 			update.x = m.getX();
 			update.y = m.getY();
@@ -869,8 +859,8 @@ public class Server2D extends JFrame implements WindowListener {
 				monsterCollisions(map);
 				for (Monster m : map.getMonsters()) {
 					m.update(timePassed);
-					if(m.summonType != -1){
-						for(Monster summon:m.summons){
+					if (m.summonType != -1) {
+						for (Monster summon : m.summons) {
 							summon.update(timePassed);
 						}
 					}
@@ -911,7 +901,8 @@ public class Server2D extends JFrame implements WindowListener {
 						add(proj.skill.skillEffect = new Effect(new Point(x, (int) proj.y - 15), Network.EXPLOARROW, 200, map.map));
 						proj.skill.hit(0);
 					} else
-						damageMonster(proj.skill.c, monster, proj.skill.c.getDamage(monster, proj.skill.skillData.dmgMult[proj.number]), proj.skill.skillData.KBSpeed[proj.number]);
+						damageMonster(proj.skill.c, monster, proj.skill.c.getDamage(monster, proj.skill.skillData.dmgMult[proj.number]),
+								proj.skill.skillData.KBSpeed[proj.number]);
 					RemoveProjectile update = new RemoveProjectile();
 					update.id = proj.id;
 					sendToAllOnMap(map.map, update, false);
@@ -941,15 +932,15 @@ public class Server2D extends JFrame implements WindowListener {
 
 			for (Monster monster : map.getMonsters()) {
 				monsterCollision(map, monster, multiPlayer);
-				if(monster.summonType != -1)
-				for(Monster summon : monster.summons){
-					monsterCollision(map, summon, multiPlayer);
-				}
+				if (monster.summonType != -1)
+					for (Monster summon : monster.summons) {
+						monsterCollision(map, summon, multiPlayer);
+					}
 			}
 
 		}
-		
-		void monsterCollision(Map map, Monster monster, float multiPlayer){
+
+		void monsterCollision(Map map, Monster monster, float multiPlayer) {
 			if (monster.isAlive()) {
 
 				monster.setLifeMultiplier(multiPlayer);
@@ -1109,12 +1100,12 @@ public class Server2D extends JFrame implements WindowListener {
 						if (monster.isAlive())
 							if (monster.getArea().intersects(c.getArea()))
 								hit(monster, c);
-						if(monster.summonType != -1)
-						for(Monster summon:monster.summons){
-							if(summon.isAlive())
-								if (summon.getArea().intersects(c.getArea()))
-									hit(summon, c);
-						}
+						if (monster.summonType != -1)
+							for (Monster summon : monster.summons) {
+								if (summon.isAlive())
+									if (summon.getArea().intersects(c.getArea()))
+										hit(summon, c);
+							}
 					}
 				}
 
@@ -1534,7 +1525,8 @@ public class Server2D extends JFrame implements WindowListener {
 						}
 						Point target = getTarget(getAimArea(), new Point(c.getX() + c.getWidth() / 2, c.getY() + c.getHeight() / 2));
 						if (target != null)
-							skillProjectiles[i].vy = (float) ((target.getY() - (skillProjectiles[i].y + skillProjectiles[i].height)) / Math.abs(target.getX() - (skillProjectiles[i].x + skillProjectiles[i].width / 2)));
+							skillProjectiles[i].vy = (float) ((target.getY() - (skillProjectiles[i].y + skillProjectiles[i].height)) / Math.abs(target.getX()
+									- (skillProjectiles[i].x + skillProjectiles[i].width / 2)));
 						if (skillProjectiles[i].vy > 0.6f)
 							skillProjectiles[i].vy = 0.6f;
 						if (skillProjectiles[i].vy < -0.6f)
@@ -1700,13 +1692,17 @@ public class Server2D extends JFrame implements WindowListener {
 			int hits = 1;
 			for (int i = 0; i < maps.get(loadedMaps.indexOf(c.map)).getMonsters().size() && hits <= getMaxEnemiesHit(); i++) {
 				Monster m = maps.get(loadedMaps.indexOf(c.map)).getMonsters().get(i);
-				if(hitMonster(m, hit)) hits++;
-				if(m.summonType != -1) for(Monster summon:m.summons) if(hitMonster(summon, hit)) hits++;
+				if (hitMonster(m, hit))
+					hits++;
+				if (m.summonType != -1)
+					for (Monster summon : m.summons)
+						if (hitMonster(summon, hit))
+							hits++;
 			}
 
 		}
-		
-		public boolean hitMonster(Monster m, int hit){
+
+		public boolean hitMonster(Monster m, int hit) {
 			if (m.isAlive())
 				if (m.getArea().intersects(getArea())) {
 					damageMonster(c, m, c.getDamage(m, getDmgMult(hit)), getKBSpeed(hit));
@@ -1740,7 +1736,7 @@ public class Server2D extends JFrame implements WindowListener {
 					charlist.add(loggedIn.get(i));
 
 		Character c = charlist.get(rand.nextInt(charlist.size()));
-		
+
 		if ((rand.nextInt(100)) < m.getdropchance() * (100 + c.getStat(Network.IF)) / 100) {
 			int id = c.id;
 
@@ -1766,7 +1762,8 @@ public class Server2D extends JFrame implements WindowListener {
 			if (dropLvl < 1)
 				dropLvl = 1;
 
-			add(new Drop(new Item(dropLvl, rand.nextInt(itemChoices), rarity), new Point(m.getX() + rand.nextInt(m.getWidth() >= 50 ? m.getWidth() - 50 : 1), m.getY() + m.getHeight() - 50), id), map);
+			add(new Drop(new Item(dropLvl, rand.nextInt(itemChoices), rarity), new Point(m.getX() + rand.nextInt(m.getWidth() >= 50 ? m.getWidth() - 50 : 1),
+					m.getY() + m.getHeight() - 50), id), map);
 		}
 
 	}
@@ -1787,9 +1784,10 @@ public class Server2D extends JFrame implements WindowListener {
 
 		if (m.isAlive()) {
 			boolean crit = false;
-			
-			if(dmg<1)dmg = 1;
-			
+
+			if (dmg < 1)
+				dmg = 1;
+
 			Random rand = new Random(System.currentTimeMillis());
 			if ((rand.nextInt(100)) < c.critChance) {
 				dmg = dmg * (c.critDamage + 100) / 100;
@@ -1806,11 +1804,13 @@ public class Server2D extends JFrame implements WindowListener {
 					m.die();
 					for (int j = 0; j < loggedIn.size(); j++) {
 						if (loggedIn.get(j).map.equals(c.map)) {
-							if (loggedIn.get(j).lvl <= m.getLevel() + 5 && loggedIn.get(j).lvl > m.getLevel()-10) {
-								
-								if (loggedIn.get(j).lvl > m.getLevel()) loggedIn.get(j).exp += m.getExp() *(1-0.15f*(loggedIn.get(j).lvl - m.getLevel()));
-								else loggedIn.get(j).exp += m.getExp();
-								
+							if (loggedIn.get(j).lvl <= m.getLevel() + 5 && loggedIn.get(j).lvl > m.getLevel() - 10) {
+
+								if (loggedIn.get(j).lvl > m.getLevel())
+									loggedIn.get(j).exp += m.getExp() * (1 - 0.15f * (loggedIn.get(j).lvl - m.getLevel()));
+								else
+									loggedIn.get(j).exp += m.getExp();
+
 								if (c.exp >= Character.expToLvl(c.lvl)) {
 									c.lvlup();
 									add(new Effect(new Point(c.getX() - 40, c.getY() - 100), Network.LVLUP, 1260, c));
@@ -1933,12 +1933,16 @@ public class Server2D extends JFrame implements WindowListener {
 	}
 
 	@Override
-	public void windowActivated(WindowEvent arg0) {}
+	public void windowActivated(WindowEvent arg0) {
+	}
+
 	@Override
-	public void windowClosed(WindowEvent arg0) {}
+	public void windowClosed(WindowEvent arg0) {
+	}
+
 	@Override
 	public void windowClosing(WindowEvent e) {
-		for(int i = 0; i < loggedIn.size(); i++){
+		for (int i = 0; i < loggedIn.size(); i++) {
 			saveCharacter(loggedIn.get(i));
 		}
 		server.close();
@@ -1946,11 +1950,18 @@ public class Server2D extends JFrame implements WindowListener {
 	}
 
 	@Override
-	public void windowDeactivated(WindowEvent arg0) {}
+	public void windowDeactivated(WindowEvent arg0) {
+	}
+
 	@Override
-	public void windowDeiconified(WindowEvent arg0) {}
+	public void windowDeiconified(WindowEvent arg0) {
+	}
+
 	@Override
-	public void windowIconified(WindowEvent arg0) {}
+	public void windowIconified(WindowEvent arg0) {
+	}
+
 	@Override
-	public void windowOpened(WindowEvent arg0) {}
+	public void windowOpened(WindowEvent arg0) {
+	}
 }
