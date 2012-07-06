@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Random;
+import java.util.Vector;
 
 import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
@@ -14,30 +15,44 @@ public class Monster {
 	
 	long cantMoveTime;
 	private int atk, def, mastery;
-
+	
+	Vector<Monster> summons;
+	
 	float life, maxLife;
 
 	private int exp, lvl, dropchance = 13, rarechance = 8, dropamount = 1;
 
-	public int avoid, width = 100, height = 50;
+	public int avoid, width = 100, height = 50, yCorrection = 0;
 	float vx = 0, vy = 0;
 	public float x = 0, y = 0;
-	private float spd, allStatsMultiplier = 1, lifeMultiplier = 1;
+	private float spd, allStatsMultiplier = 1, lifeMultiplier = 1, summonMultiplier = 0.5f;
 	private float[] statMultipliers = {1,1,1,1,1,1,1,1,1,1};
 	private boolean facingLeft = true;
 
 	boolean canMove = true;
 
-	private boolean alive = false;
+	private boolean alive = false, special = false;
 
 	Character isAggro = null;
-	int type = 0, eliteT = -1;
+	int type = 0, eliteT = -1, summonType = -1, maxSummons = 0, summonTimer = 10000;
 	boolean elite = false;
 	private Point spawnPoint;
-	private long timer, deathTimer = 200, regen = 0;
+	private int timer, deathTimer = 200, regen = 0;
 
 	long aggroTimer = 5000;
 	public String name;
+	
+	public Monster(int i, Point spawn, float statMultiplier){
+		this(i, spawn);
+		allStatsMultiplier = statMultiplier;
+		special = true;
+		summonType = -1;
+		summons = null;
+		name = "Summon"+name;
+		statMultipliers[SPD] = 0.9f/statMultiplier;
+		lvl-=1;
+		init();
+	}
 	
 	public Monster(int i, Point spawn) {
 		type = i;
@@ -149,9 +164,11 @@ public class Monster {
 		case MUSH:
 			width = 300;
 			height = 300;
+			special = true;
 			break;
 		}
 		this.spawnPoint = spawn;
+		if(summonType != -1) summons = new Vector<Monster>();
 	}
 	
 	public int getHeight(){
@@ -163,6 +180,7 @@ public class Monster {
 	
 	// initialise le monstre
 	public void init() {
+		if(!special)
 		randomElite();
 		life = getMaxLife();
 		canMove = true;
@@ -237,6 +255,16 @@ public class Monster {
 				if(life < maxLife)
 				life++;
 				regen=0;
+			}
+			
+			if(summonType != -1){
+				if(summons.size() < maxSummons){
+					summonTimer -= timePassed;
+					if(summonTimer <= 0){
+						summons.add(new Monster(summonType, new Point(getX(),getY()-yCorrection), summonMultiplier));
+					}
+					
+				}
 			}
 			
 			if(canMove && vx < 0 && vx != getSpeed()) vx = getSpeed();

@@ -464,7 +464,7 @@ public class Server2D extends JFrame implements WindowListener {
 
 		setContentPane(content);
 		pack();
-		setSize(500,800);
+		setSize(400,400);
 		setResizable(false);
 		setLocationRelativeTo(null);
 		addWindowListener(this);
@@ -709,20 +709,28 @@ public class Server2D extends JFrame implements WindowListener {
 			for (Map map : tempMaps) {
 				for (int i = 0; i < map.getMonsters().size(); i++) {
 					Monster m = map.getMonsters().get(i);
-					UpdateMonster update = new UpdateMonster();
-					update.x = m.getX();
-					update.y = m.getY();
-					update.id = i;
-					update.canMove = m.canMove;
-					update.facingLeft = m.isFacingLeft();
-					update.type = m.type;
-					update.alive = m.isAlive();
-					update.lifePercentage = (int) (1000 * m.life / m.getMaxLife());
-					update.eliteType = m.eliteT;
-					update.lvl = m.getLevel();
-					sendToAllOnMap(map.map, update, true);
+					sendMonsterData(m, map.map, i);
+					if(m.summonType != -1)
+					for(int y = 0; y < m.summons.size(); y++){
+						sendMonsterData(m.summons.get(y), map.map, 100+i*20+y);
+					}
 				}
 			}
+		}
+		
+		void sendMonsterData(Monster m, String map, int id){
+			UpdateMonster update = new UpdateMonster();
+			update.x = m.getX();
+			update.y = m.getY();
+			update.id = id;
+			update.canMove = m.canMove;
+			update.facingLeft = m.isFacingLeft();
+			update.type = m.type;
+			update.alive = m.isAlive();
+			update.lifePercentage = (int) (1000 * m.life / m.getMaxLife());
+			update.eliteType = m.eliteT;
+			update.lvl = m.getLevel();
+			sendToAllOnMap(map, update, true);
 		}
 
 		void sendCharsData() {
@@ -857,6 +865,11 @@ public class Server2D extends JFrame implements WindowListener {
 				monsterCollisions(map);
 				for (Monster m : map.getMonsters()) {
 					m.update(timePassed);
+					if(m.summonType != -1){
+						for(Monster summon:m.summons){
+							summon.update(timePassed);
+						}
+					}
 				}
 
 				for (int i = 0; i < projectiles.get(map.map).size(); i++) {
@@ -923,53 +936,61 @@ public class Server2D extends JFrame implements WindowListener {
 			}
 
 			for (Monster monster : map.getMonsters()) {
-				if (monster.isAlive()) {
-
-					monster.setLifeMultiplier(multiPlayer);
-
-					boolean canFall = true;
-
-					for (Wall wall : map.getWalls())
-						if (wall != null)
-							if (wall.getTop().intersects(monster.getBase()) && monster.vy >= 0) {
-								monster.y = wall.getTopY() - monster.getHeight();
-								monster.vy = 0;
-								canFall = false;
-							}
-
-					for (Platform platform : map.getPlatforms())
-						if (platform != null)
-							if (platform.getTop().intersects(monster.getBase()) && monster.vy >= 0) {
-								monster.y = platform.getTopY() - monster.getHeight();
-								monster.vy = 0;
-								canFall = false;
-							}
-
-					turnMonster(monster, map);
-
-					if (monster.y < 0 && monster.vy < 0) {
-						monster.vy = 0;
-						monster.y = 0;
-					}
-					if (monster.y + monster.getHeight() > map.getYLimit() && monster.vy > 0) {
-						monster.vy = 0;
-						monster.y = map.getYLimit() - monster.getHeight();
-						canFall = false;
-					}
-
-					if (monster.x < 0 && monster.vx < 0) {
-						monster.x = 0;
-						monster.vx = -monster.getSpeed();
-					} else if (monster.x + monster.getWidth() > map.getXLimit() && monster.vx > 0) {
-						monster.x = map.getXLimit() - monster.getWidth();
-						monster.vx = monster.getSpeed();
-					}
-
-					if (canFall)
-						monster.fall(timePassed);
+				monsterCollision(map, monster, multiPlayer);
+				if(monster.summonType != -1)
+				for(Monster summon : monster.summons){
+					monsterCollision(map, summon, multiPlayer);
 				}
 			}
 
+		}
+		
+		void monsterCollision(Map map, Monster monster, float multiPlayer){
+			if (monster.isAlive()) {
+
+				monster.setLifeMultiplier(multiPlayer);
+
+				boolean canFall = true;
+
+				for (Wall wall : map.getWalls())
+					if (wall != null)
+						if (wall.getTop().intersects(monster.getBase()) && monster.vy >= 0) {
+							monster.y = wall.getTopY() - monster.getHeight();
+							monster.vy = 0;
+							canFall = false;
+						}
+
+				for (Platform platform : map.getPlatforms())
+					if (platform != null)
+						if (platform.getTop().intersects(monster.getBase()) && monster.vy >= 0) {
+							monster.y = platform.getTopY() - monster.getHeight();
+							monster.vy = 0;
+							canFall = false;
+						}
+
+				turnMonster(monster, map);
+
+				if (monster.y < 0 && monster.vy < 0) {
+					monster.vy = 0;
+					monster.y = 0;
+				}
+				if (monster.y + monster.getHeight() > map.getYLimit() && monster.vy > 0) {
+					monster.vy = 0;
+					monster.y = map.getYLimit() - monster.getHeight();
+					canFall = false;
+				}
+
+				if (monster.x < 0 && monster.vx < 0) {
+					monster.x = 0;
+					monster.vx = -monster.getSpeed();
+				} else if (monster.x + monster.getWidth() > map.getXLimit() && monster.vx > 0) {
+					monster.x = map.getXLimit() - monster.getWidth();
+					monster.vx = monster.getSpeed();
+				}
+
+				if (canFall)
+					monster.fall(timePassed);
+			}
 		}
 
 		public void turnMonster(Monster m, Map map) {
@@ -1084,6 +1105,12 @@ public class Server2D extends JFrame implements WindowListener {
 						if (monster.isAlive())
 							if (monster.getArea().intersects(c.getArea()))
 								hit(monster, c);
+						if(monster.summonType != -1)
+						for(Monster summon:monster.summons){
+							if(summon.isAlive())
+								if (summon.getArea().intersects(c.getArea()))
+									hit(summon, c);
+						}
 					}
 				}
 
@@ -1669,21 +1696,27 @@ public class Server2D extends JFrame implements WindowListener {
 			int hits = 1;
 			for (int i = 0; i < maps.get(loadedMaps.indexOf(c.map)).getMonsters().size() && hits <= getMaxEnemiesHit(); i++) {
 				Monster m = maps.get(loadedMaps.indexOf(c.map)).getMonsters().get(i);
-				if (m.isAlive())
-					if (m.getArea().intersects(getArea())) {
-						damageMonster(c, m, c.getDamage(m, getDmgMult(hit)), getKBSpeed(hit));
-
-						if (skillData.manaUsed < 0) {
-							int manaU = skillData.manaUsed * (c.atts[Network.SPIRIT] + 100) / 100;
-							if (c.mana - manaU > c.maxMana)
-								c.mana = c.maxMana;
-							else
-								c.mana -= manaU;
-						}
-						hits++;
-					}
+				if(hitMonster(m, hit)) hits++;
+				if(m.summonType != -1) for(Monster summon:m.summons) if(hitMonster(summon, hit)) hits++;
 			}
 
+		}
+		
+		public boolean hitMonster(Monster m, int hit){
+			if (m.isAlive())
+				if (m.getArea().intersects(getArea())) {
+					damageMonster(c, m, c.getDamage(m, getDmgMult(hit)), getKBSpeed(hit));
+
+					if (skillData.manaUsed < 0) {
+						int manaU = skillData.manaUsed * (c.atts[Network.SPIRIT] + 100) / 100;
+						if (c.mana - manaU > c.maxMana)
+							c.mana = c.maxMana;
+						else
+							c.mana -= manaU;
+					}
+					return true;
+				}
+			return false;
 		}
 
 	}
