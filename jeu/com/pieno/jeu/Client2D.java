@@ -1080,16 +1080,13 @@ public class Client2D
 			}
 			if (skillMenu != null) if (menu.currentMenu == SKILL)
 			{
-				for (int i = 0; i < skillMenu.buttons.length; i++)
+				for (Button button : skillMenu.buttons)
 				{
-					SkillButton skillButton;
-					if (skillMenu.buttons[i] instanceof SkillButton) skillButton = (SkillButton) skillMenu.buttons[i];
-					else continue;
-					if (skillButton.getArea().contains(location)) skillButton.activate();
-					if (skillButton.keyButton != null) if (skillButton.keyButton.area.contains(location))
-					{
-						skillButton.keyButton.activate();
-					}
+					if (button.getArea().contains(location)) button.activate();
+				}
+				for(Button button : skillMenu.keyButtons){
+					if(button!=null)
+						if (button.getArea().contains(location)) button.activate();
 				}
 			}
 
@@ -1339,23 +1336,18 @@ public class Client2D
 				drawInventory(g);
 				break;
 			case STAT:
-				drawStatMenu(g);
+				statMenu.draw(g);
 				break;
 			case SKILL:
 				drawSkillMenu(g);
 				break;
 			case MISC:
-				drawMiscMenu(g);
+				miscMenu.draw(g);
 				break;
 			case NONE:
 				return;
 			}
 			drawMenuBar(g);
-		}
-
-		private void drawMiscMenu(Graphics2D g)
-		{
-			miscMenu.draw(g);
 		}
 
 		private void drawMenuBar(Graphics2D g)
@@ -1660,9 +1652,7 @@ public class Client2D
 						break;
 					}
 					g.drawString("" + skillButton.getManaUsed(), skillButton.getNamePos().x - 465, skillButton.getNamePos().y);
-
-					skillButton.keyButton.draw(g);
-
+					skillMenu.keyButtons[skillButton.skillSlot].draw(g);
 				}
 
 				g.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -1684,22 +1674,6 @@ public class Client2D
 
 			g.setColor(Color.WHITE);
 			g.drawString("Remaining points : " + currentChar.skillStats, 950, 500);
-		}
-
-		private void drawStatMenu(Graphics2D g)
-		{
-			g.setFont(new Font("Arial", Font.PLAIN, 14));
-			g.setColor(Color.GRAY);
-			g.fill(statMenu.getArea());
-			g.setColor(Color.BLACK);
-			g.draw(statMenu.getArea());
-
-			for (int i = 0; i < statMenu.buttons.length; i++)
-			{
-				statMenu.buttons[i].draw(g);
-			}
-			g.setColor(Color.WHITE);
-			g.drawString("Remaining points : " + currentChar.attStats, statMenu.getArea().x + 100, 480);
 		}
 
 		private void drawDamageText(Graphics2D g)
@@ -1877,7 +1851,7 @@ public class Client2D
 				case INV:
 					text[0] = "Inventory: ";
 					break;
-				case SKILL:
+				case Client2D.SKILL:
 					text[0] = "Skills menu: ";
 					break;
 				case MISC:
@@ -1998,10 +1972,11 @@ public class Client2D
 
 	public abstract class Menu
 	{
+		Font textFont = new Font("Arial", Font.PLAIN, 14);
 		Rectangle area = new Rectangle(750, 38, 500, 550);
 		Button[] buttons;
 		String[] text;
-
+		
 		Point getTextPos(int i)
 		{
 			return null;
@@ -2009,6 +1984,7 @@ public class Client2D
 
 		void draw(Graphics2D g)
 		{
+			g.setFont(textFont);
 			g.setColor(Color.GRAY);
 			g.fill(area);
 			g.setColor(Color.BLACK);
@@ -2017,6 +1993,9 @@ public class Client2D
 			{
 				if (text[i] != null && getTextPos(i) != null) g.drawString(text[i], getTextPos(i).x, getTextPos(i).y);
 			}
+			drawButtons(g);
+		}
+		void drawButtons(Graphics2D g){
 			for (int i = 0; i < buttons.length; i++)
 				buttons[i].draw(g);
 		}
@@ -2182,7 +2161,6 @@ public class Client2D
 
 	public class SkillButton extends Button
 	{
-		KeyButton keyButton;
 		int skill, skillSlot;
 		private Rectangle area;
 		Point namePos;
@@ -2243,10 +2221,10 @@ public class Client2D
 				}
 				break;
 			}
-			setArea(new Rectangle(menu.x + menu.width - 110, menu.y + 50 + (i - 1) * 85, 100, 50));
-			namePos = new Point(menu.x + menu.width - 80, menu.y + 85 + (i - 1) * 85);
+			setArea(new Rectangle(menu.area.x + menu.area.width - 110, menu.area.y + 50 + (i - 1) * 85, 100, 50));
+			namePos = new Point(menu.area.x + menu.area.width - 80, menu.area.y + 85 + (i - 1) * 85);
 
-			if (!passive) keyButton = new KeyButton(i, KeyButton.SKILL, area.x + 30, area.y + 51);
+			if (!passive) menu.keyButtons[i] = new KeyButton(i, KeyButton.SKILL, area.x + 30, area.y + 51);
 		}
 
 		public Point getNamePos()
@@ -2364,10 +2342,11 @@ public class Client2D
 
 	public class SkillMenu extends Menu
 	{
-		int x = 750, y = 38, width = 500, height = 550;
+		KeyButton[] keyButtons;
 
 		public SkillMenu()
 		{
+			keyButtons = new KeyButton[3];
 			buttons = new SkillButton[3];
 		}
 
@@ -2378,10 +2357,17 @@ public class Client2D
 				buttons[i] = new SkillButton(i + 1, this);
 			}
 		}
+		
+		@Override
+		void drawButtons(Graphics2D g){
+			super.drawButtons(g);
+			for(KeyButton button: keyButtons)
+				button.draw(g);
+		}
 
 		public Rectangle getArea()
 		{
-			return new Rectangle(x, y, width, height);
+			return area;
 		}
 
 	}
@@ -2481,6 +2467,12 @@ public class Client2D
 			for (int i = 0; i < 4; i++)
 				buttons[i] = new StatButton(new Point(area.x + 10, 80 + i * 100), i);
 
+		}
+		
+		void draw(Graphics2D g){
+			super.draw(g);
+			g.setColor(Color.WHITE);
+			g.drawString("Remaining points : " + currentChar.attStats, statMenu.getArea().x + 100, 480);
 		}
 
 		public Rectangle getArea()
