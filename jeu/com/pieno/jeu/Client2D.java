@@ -1083,7 +1083,7 @@ public class Client2D
 				for (int i = 0; i < skillMenu.buttons.length; i++)
 				{
 					SkillButton skillButton;
-					if(skillMenu.buttons[i] instanceof SkillButton) skillButton = (SkillButton) skillMenu.buttons[i];
+					if (skillMenu.buttons[i] instanceof SkillButton) skillButton = (SkillButton) skillMenu.buttons[i];
 					else continue;
 					if (skillButton.getArea().contains(location)) skillButton.activate();
 					if (skillButton.keyButton != null) if (skillButton.keyButton.area.contains(location))
@@ -1638,7 +1638,7 @@ public class Client2D
 			for (Button button : skillMenu.buttons)
 			{
 				SkillButton skillButton;
-				if(button instanceof SkillButton) skillButton = (SkillButton) button;
+				if (button instanceof SkillButton) skillButton = (SkillButton) button;
 				else continue;
 				if (skillButton == null || skillButton.getArea() == null) continue;
 				g.setColor(Color.WHITE);
@@ -1698,8 +1698,8 @@ public class Client2D
 			{
 				statMenu.buttons[i].draw(g);
 			}
-				g.setColor(Color.WHITE);
-				g.drawString("Remaining points : " + currentChar.attStats, statMenu.getArea().x + 100, 480);
+			g.setColor(Color.WHITE);
+			g.drawString("Remaining points : " + currentChar.attStats, statMenu.getArea().x + 100, 480);
 		}
 
 		private void drawDamageText(Graphics2D g)
@@ -2013,11 +2013,9 @@ public class Client2D
 			g.fill(area);
 			g.setColor(Color.BLACK);
 			g.draw(area);
-			if(text != null)
-			for (int i = 0; i < text.length; i++)
+			if (text != null) for (int i = 0; i < text.length; i++)
 			{
-				if(text[i]!=null && getTextPos(i)!=null)
-				g.drawString(text[i], getTextPos(i).x, getTextPos(i).y);
+				if (text[i] != null && getTextPos(i) != null) g.drawString(text[i], getTextPos(i).x, getTextPos(i).y);
 			}
 			for (int i = 0; i < buttons.length; i++)
 				buttons[i].draw(g);
@@ -2423,7 +2421,8 @@ public class Client2D
 			return area;
 		}
 
-		void draw(Graphics2D g){
+		void draw(Graphics2D g)
+		{
 			g.setColor(Color.WHITE);
 			g.fill(getArea());
 			g.setColor(Color.BLACK);
@@ -2432,7 +2431,7 @@ public class Client2D
 			g.drawString(getInfo(), getTextPosition().x + 50, getTextPosition().y - 20);
 			g.drawString(Integer.toString(currentChar.atts[stat]), getTextPosition().x + 8, getTextPosition().y - 25);
 		}
-		
+
 		public Point getTextPosition()
 		{
 			return textPosition;
