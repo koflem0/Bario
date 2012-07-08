@@ -6,26 +6,30 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
-public class MonsterAnimation{
+public class MonsterAnimation
+{
 	int x, y, type, eliteType, lvl;
 	int lastUpdate = 0, frames = 0;
 	int lifePercentage;
-	private Image[] monstreD,monstreG;
+	private Image[] monstreD, monstreG;
 	private Image monstreHitD, monstreHitL;
 	Animation hitLeft, hitRight, left, right;
 	boolean summoned = false;
 	boolean canMove, facingLeft, alive = false;
-	
-	public MonsterAnimation(int type){
+
+	public MonsterAnimation(int type)
+	{
 		this.type = type;
 		getAnimations(type);
-		
+
 	}
-	
+
 	// load les images du monstre
-	public void loadpics(int y) {
+	public void loadpics(int y)
+	{
 		String name = "";
-		switch (y) {
+		switch (y)
+		{
 		case Monster.COBRA:
 			name = "cobra";
 			frames = 2;
@@ -62,23 +66,26 @@ public class MonsterAnimation{
 			name = "TREANT";
 			frames = 4;
 		}
-		
-		monstreD = new Image[frames+1];
-		monstreG = new Image[frames+1];
-		for(int i = 1; i <= frames; i++){
-			monstreD[i] = newImage("/"+name+i+"D.png");
-			monstreG[i] = newImage("/"+name+i+"G.png");
+
+		monstreD = new Image[frames + 1];
+		monstreG = new Image[frames + 1];
+		for (int i = 1; i <= frames; i++)
+		{
+			monstreD[i] = newImage("/" + name + i + "D.png");
+			monstreG[i] = newImage("/" + name + i + "G.png");
 		}
 	}
-	
+
 	// load les animations du monstre
-	private void getAnimations(int i) {
+	private void getAnimations(int i)
+	{
 		hitLeft = new Animation();
 		hitRight = new Animation();
 		right = new Animation();
 		left = new Animation();
 		loadpics(i);
-		switch (i) {
+		switch (i)
+		{
 		case Monster.COBRA:
 		case Monster.BIGCOBRA:
 		case Monster.VERYBIGCOBRA:
@@ -87,19 +94,19 @@ public class MonsterAnimation{
 			left.addScene(monstreG[1], 220);
 			left.addScene(monstreG[2], 220);
 			hitLeft.addScene(monstreG[1], 200);
-			hitRight.addScene(monstreD[1],200);
+			hitRight.addScene(monstreD[1], 200);
 			break;
 		case Monster.COC:
-			right.addScene(monstreD[1],110);
-			right.addScene(monstreD[2],110);
-			right.addScene(monstreD[3],110);
-			right.addScene(monstreD[4],110);
-			left.addScene(monstreG[1],110);
-			left.addScene(monstreG[2],110);
-			left.addScene(monstreG[3],110);
-			left.addScene(monstreG[4],110);
+			right.addScene(monstreD[1], 110);
+			right.addScene(monstreD[2], 110);
+			right.addScene(monstreD[3], 110);
+			right.addScene(monstreD[4], 110);
+			left.addScene(monstreG[1], 110);
+			left.addScene(monstreG[2], 110);
+			left.addScene(monstreG[3], 110);
+			left.addScene(monstreG[4], 110);
 			hitLeft.addScene(monstreG[1], 200);
-			hitRight.addScene(monstreD[1],200);
+			hitRight.addScene(monstreD[1], 200);
 			break;
 		case Monster.MUSH:
 			right.addScene(monstreD[1], 50);
@@ -158,51 +165,74 @@ public class MonsterAnimation{
 			break;
 		}
 	}
-	
-	public void update(long timePassed){
+
+	public void update(long timePassed)
+	{
 		getAnimation().update(timePassed);
-		lastUpdate+= timePassed;
-		if(lastUpdate>=800) alive = false;
+		lastUpdate += timePassed;
+		if (lastUpdate >= 800) alive = false;
 	}
-	
-	public String getName(){
-		switch(type){
-		case Monster.COBRA: return "Cobra";
-		case Monster.BIGCOBRA: return "BigCobra";
-		case Monster.VERYBIGCOBRA: return "VBigCobra";
-		case Monster.COC: return "Cocksinel";
-		case Monster.BABYSPIDER: return "BabySpider";
-		case Monster.MUSHY: return "Mushy";
-		case Monster.MUSH: return "Big Mush";
-		case Monster.MUSHETTE: return"Mushette";
-		case Monster.TREANT: return "Treant";
+
+	public String getName()
+	{
+		switch (type)
+		{
+		case Monster.COBRA:
+			return "Cobra";
+		case Monster.BIGCOBRA:
+			return "BigCobra";
+		case Monster.VERYBIGCOBRA:
+			return "VBigCobra";
+		case Monster.COC:
+			return "Cocksinel";
+		case Monster.BABYSPIDER:
+			return "BabySpider";
+		case Monster.MUSHY:
+			return "Mushy";
+		case Monster.MUSH:
+			return "Big Mush";
+		case Monster.MUSHETTE:
+			return "Mushette";
+		case Monster.TREANT:
+			return "Treant";
 		}
-		return"";
+		return "";
 	}
-	
-	public String getEliteType(){
-		switch(eliteType){
-		case Monster.DMG: return "DMG";
-		case Monster.SPD: return "SPD";
-		case Monster.DEF: return "DEF";
-		case Monster.SLOW: return "SLOW";
-		default: return "";
+
+	public String getEliteType()
+	{
+		switch (eliteType)
+		{
+		case Monster.DMG:
+			return "DMG";
+		case Monster.SPD:
+			return "SPD";
+		case Monster.DEF:
+			return "DEF";
+		case Monster.SLOW:
+			return "SLOW";
+		default:
+			return "";
 		}
 	}
-	
+
 	// retourne l'animation du monstre
-	public Animation getAnimation() {
-		if (facingLeft){
-			if(!canMove) return hitLeft;
+	public Animation getAnimation()
+	{
+		if (facingLeft)
+		{
+			if (!canMove) return hitLeft;
 			return this.left;
-		}else{
-			if(!canMove) return hitRight;
+		} else
+		{
+			if (!canMove) return hitRight;
 			return right;
 		}
 	}
-	
-	public Image newImage(String source) {
-		return new ImageIcon(getClass().getResource("/monster"+source)).getImage();
+
+	public Image newImage(String source)
+	{
+		return new ImageIcon(getClass().getResource("/monster" + source)).getImage();
 	}
 
 }

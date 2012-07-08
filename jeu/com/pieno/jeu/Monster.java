@@ -9,15 +9,16 @@ import java.util.Vector;
 import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 
-public class Monster {
+public class Monster
+{
 	public static final int COBRA = 0, BIGCOBRA = 1, COC = 2, VERYBIGCOBRA = 3, MUSH = 4, BABYSPIDER = 5, MUSHY = 6, MUSHETTE = 7, TREANT = 8;
-	public static final int DMG = 0, SPD = 1, DEF = 2, SLOW = 3; 
-	
+	public static final int DMG = 0, SPD = 1, DEF = 2, SLOW = 3;
+
 	long cantMoveTime;
 	private int atk, def, mastery;
-	
+
 	Vector<Monster> summons;
-	
+
 	float life, maxLife;
 
 	private int exp, lvl, dropchance = 13, rarechance = 9, dropamount = 1;
@@ -26,7 +27,7 @@ public class Monster {
 	float vx = 0, vy = 0;
 	public float x = 0, y = 0;
 	private float spd, allStatsMultiplier = 1, lifeMultiplier = 1, summonMultiplier = 0.5f;
-	private float[] statMultipliers = {1,1,1,1,1,1,1,1,1,1};
+	private float[] statMultipliers = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 	private boolean facingLeft = true;
 
 	boolean canMove = true;
@@ -39,23 +40,26 @@ public class Monster {
 	private int timer, deathTimer = 200, regen = 0;
 
 	long aggroTimer = 5000;
-	
-	public Monster(int i, Point spawn, float statMultiplier, int eliteType){
+
+	public Monster(int i, Point spawn, float statMultiplier, int eliteType)
+	{
 		this(i, spawn);
 		allStatsMultiplier = statMultiplier;
 		special = true;
 		summonType = -1;
 		summons = null;
 		timer = 60000;
-		lvl-=1;
+		lvl -= 1;
 		generateElite(eliteType);
-		statMultipliers[SPD] = 0.9f/statMultiplier * statMultipliers[SPD];
+		statMultipliers[SPD] = 0.9f / statMultiplier * statMultipliers[SPD];
 		init();
 	}
-	
-	public Monster(int i, Point spawn) {
+
+	public Monster(int i, Point spawn)
+	{
 		type = i;
-		switch (i) {
+		switch (i)
+		{
 		case COBRA:
 			atk = 12;
 			def = 2;
@@ -157,7 +161,7 @@ public class Monster {
 			width = 300;
 			height = 300;
 			special = true;
-			//TODO
+			// TODO
 			break;
 		case TREANT:
 			atk = 100;
@@ -181,20 +185,23 @@ public class Monster {
 			break;
 		}
 		this.spawnPoint = spawn;
-		if(summonType != -1) summons = new Vector<Monster>();
+		if (summonType != -1) summons = new Vector<Monster>();
 	}
-	
-	public int getHeight(){
+
+	public int getHeight()
+	{
 		return height;
 	}
-	public int getWidth(){
+
+	public int getWidth()
+	{
 		return width;
 	}
-	
+
 	// initialise le monstre
-	public void init() {
-		if(!special)
-		randomElite();
+	public void init()
+	{
+		if (!special) randomElite();
 		life = getMaxLife();
 		canMove = true;
 		facingLeft = true;
@@ -202,132 +209,162 @@ public class Monster {
 		vx = getSpeed();
 		x = spawnPoint.x;
 		y = spawnPoint.y;
-		summonTimer = summonTime/5;
+		summonTimer = summonTime / 5;
 		alive = true;
 	}
-	
-	public void generateElite(int type){
+
+	public void generateElite(int type)
+	{
 		eliteT = type;
-		if(type == -1){
+		if (type == -1)
+		{
 			allStatsMultiplier = 1 * allStatsMultiplier;
-			for(int i = 0; i < 10; i++)
+			for (int i = 0; i < 10; i++)
 				statMultipliers[i] = 1;
-			
+
 			return;
 		}
 		allStatsMultiplier = 1.3f * allStatsMultiplier;
-		switch(eliteT){
-		case DEF : statMultipliers[DEF] = 1.3f; break;
-		case DMG : statMultipliers[DMG] = 1.3f; break;
-		case SPD : statMultipliers[SPD] = 1.3f; break;
-		case SLOW : statMultipliers[DEF] = 1.2f; statMultipliers[SPD] = 0.6f; statMultipliers[DMG] = 1.2f; break;
+		switch (eliteT)
+		{
+		case DEF:
+			statMultipliers[DEF] = 1.3f;
+			break;
+		case DMG:
+			statMultipliers[DMG] = 1.3f;
+			break;
+		case SPD:
+			statMultipliers[SPD] = 1.3f;
+			break;
+		case SLOW:
+			statMultipliers[DEF] = 1.2f;
+			statMultipliers[SPD] = 0.6f;
+			statMultipliers[DMG] = 1.2f;
+			break;
 		}
 	}
-	
-	public void randomElite(){
+
+	public void randomElite()
+	{
 		allStatsMultiplier = 1;
-		
+
 		Random rand = new Random();
-		if(1 > rand.nextInt(10)){
+		if (1 > rand.nextInt(10))
+		{
 			generateElite(rand.nextInt(4));
-		} else {
+		} else
+		{
 			generateElite(-1);
 		}
 	}
-	
-	public void jump(){
+
+	public void jump()
+	{
 		vy = -1;
 	}
-	
+
 	// change le point ou le monstre apparait
-	public void setSpawn(Point Spawn) {
+	public void setSpawn(Point Spawn)
+	{
 		spawnPoint = Spawn;
 	}
-	
-	public int getExp() {
-		return (int)(exp*allStatsMultiplier);
+
+	public int getExp()
+	{
+		return (int) (exp * allStatsMultiplier);
 	}
-	
+
 	// retourne la vie du monstre
-	public int getLife() {
-		return (int)life;
+	public int getLife()
+	{
+		return (int) life;
 	}
-	
-	public void setLifeMultiplier(float lifeMultiplier){
-		this.maxLife = maxLife * lifeMultiplier/this.lifeMultiplier;
-		this.life = life * lifeMultiplier/this.lifeMultiplier;
+
+	public void setLifeMultiplier(float lifeMultiplier)
+	{
+		this.maxLife = maxLife * lifeMultiplier / this.lifeMultiplier;
+		this.life = life * lifeMultiplier / this.lifeMultiplier;
 		this.lifeMultiplier = lifeMultiplier;
 	}
 
-	public int getMaxLife() {
-		return (int)(maxLife * allStatsMultiplier * statMultipliers[DEF]);
+	public int getMaxLife()
+	{
+		return (int) (maxLife * allStatsMultiplier * statMultipliers[DEF]);
 	}
 
-	public int getLevel() {
-		if(eliteT != -1) return lvl + 2;
+	public int getLevel()
+	{
+		if (eliteT != -1) return lvl + 2;
 		return lvl;
 	}
 
 	// modifie la position et la vitesse du monstre, le fais réapparaitre
-	public void update(long timePassed) {
-		if (alive) {
-			regen+= timePassed;
-			if(regen >= 40000/getMaxLife()+200){
-				if(life < getMaxLife())
-				life++;
-				regen=0;
+	public void update(long timePassed)
+	{
+		if (alive)
+		{
+			regen += timePassed;
+			if (regen >= 60000 / getMaxLife() + 300)
+			{
+				if (life < getMaxLife()) life++;
+				regen = 0;
 			}
-			
-			if(summonType != -1 && isAggro != null){
-				if(summons.size() < maxSummons){
+
+			if (summonType != -1 && isAggro != null)
+			{
+				if (summons.size() < maxSummons)
+				{
 					summonTimer -= timePassed;
-					if(summonTimer <= 0){
-						summons.add(new Monster(summonType, new Point(getX(),getY()-yCorrection), summonMultiplier, eliteT));
-						if(isAggro.x +isAggro.getWidth()/2 > x+width/2) {
-							Monster summon = summons.get(summons.size()-1);
+					if (summonTimer <= 0)
+					{
+						summons.add(new Monster(summonType, new Point(getX(), getY() - yCorrection), summonMultiplier, eliteT));
+						if (isAggro.x + isAggro.getWidth() / 2 > x + width / 4)
+						{
+							Monster summon = summons.get(summons.size() - 1);
 							summon.vx = -summon.vx;
 							summon.setFacingLeft(false);
 						}
 						summonTimer = summonTime;
 					}
-					
+
 				}
 			}
-			if(summonType != -1){
-				for(Monster summon:summons){
-					if(!summon.isAlive())
-						summons.remove(summon);
+			if (summonType != -1)
+			{
+				for (Monster summon : summons)
+				{
+					if (!summon.isAlive()) summons.remove(summon);
 				}
 			}
-			
-			if(canMove && vx < 0 && vx != getSpeed()) vx = getSpeed();
-			if(canMove && vx > 0 && vx != -getSpeed()) vx = -getSpeed();
-			
-			
-			if (vx == getSpeed() || vx == -getSpeed())
-				if ((isFacingLeft() && vx > 0)
-						|| (!(isFacingLeft()) && vx < 0))
-					vx = -vx;
-			
+
+			if (canMove && vx < 0 && vx != getSpeed()) vx = getSpeed();
+			if (canMove && vx > 0 && vx != -getSpeed()) vx = -getSpeed();
+
+			if (vx == getSpeed() || vx == -getSpeed()) if ((isFacingLeft() && vx > 0) || (!(isFacingLeft()) && vx < 0)) vx = -vx;
+
 			x += vx * timePassed;
 			y += vy * timePassed;
-			
-			if (cantMoveTime >= 0) {
+
+			if (cantMoveTime >= 0)
+			{
 				cantMoveTime -= timePassed;
 			}
-			if (cantMoveTime <= 0)
-				canMove = true;
-			
-			if(isAggro!=null){
-			if(aggroTimer>=0){
-				aggroTimer-=timePassed;
+			if (cantMoveTime <= 0) canMove = true;
+
+			if (isAggro != null)
+			{
+				if (aggroTimer >= 0)
+				{
+					aggroTimer -= timePassed;
+				}
+				if (aggroTimer <= 0) isAggro = null;
 			}
-			if(aggroTimer<=0) isAggro = null;
-			}
-			
-		} else {
+
+		} else
+		{
 			deathTimer -= timePassed;
-			if (deathTimer <= 0) {
+			if (deathTimer <= 0)
+			{
 				init();
 			}
 		}
@@ -335,104 +372,115 @@ public class Monster {
 	}
 
 	// retourne si le monstre est en vie
-	public boolean isAlive() {
+	public boolean isAlive()
+	{
 		return alive;
 	}
 
 	// retourne si le monstre peut bouger
-	public boolean canMove() {
+	public boolean canMove()
+	{
 		return canMove;
 	}
 
-
 	// fais mourir le monstre
-	void die() {
-		alive = false; isAggro = null;
+	void die()
+	{
+		alive = false;
+		isAggro = null;
 		deathTimer = timer;
 	}
-	
-	int getdropamount(){
-		if(eliteT != -1) return (int) ((dropamount*1.5)*lifeMultiplier);
-		return (int)(dropamount*lifeMultiplier);
+
+	int getdropamount()
+	{
+		if (eliteT != -1) return (int) ((dropamount * 1.5) * lifeMultiplier);
+		return (int) (dropamount * lifeMultiplier);
 	}
-	
-	int getdropchance(){
-		return (int)(dropchance*allStatsMultiplier);
+
+	int getdropchance()
+	{
+		return (int) (dropchance * allStatsMultiplier);
 	}
-	
-	int getrarechance(){
-		return (int)(rarechance*allStatsMultiplier);
+
+	int getrarechance()
+	{
+		return (int) (rarechance * allStatsMultiplier);
 	}
-	
-	public int getX(){
-		return (int)x;
+
+	public int getX()
+	{
+		return (int) x;
 	}
-	
-	public int getY(){
-		return (int)y;
-		}
+
+	public int getY()
+	{
+		return (int) y;
+	}
 
 	// retourne l'espace ou la prochaine platforme devrait être
-	public Rectangle getNextFloor() {
-		if (facingLeft)
-			return new Rectangle(getX()- 25, getY() + height - 5, 20,
-					15);
-		return new Rectangle(getX() + width + 5, getY() + height
-				- 5, 20, 15);
+	public Rectangle getNextFloor()
+	{
+		if (facingLeft) return new Rectangle(getX() - 25, getY() + height - 5, 20, 15);
+		return new Rectangle(getX() + width + 5, getY() + height - 5, 20, 15);
 	}
 
 	// retourne le coté du monstre
-	public Rectangle getSide() {
-		if (vx < 0)
-			return new Rectangle(getX() - 10, getY() + 10, 20,
-					height - 25);
-		return new Rectangle(getX() + width - 10, getY() + 10, 20,
-				height - 25);
+	public Rectangle getSide()
+	{
+		if (vx < 0) return new Rectangle(getX() - 10, getY() + 10, 20, height - 25);
+		return new Rectangle(getX() + width - 10, getY() + 10, 20, height - 25);
 	}
 
 	// retourne si le monstre "regarde" a gauche
-	public boolean isFacingLeft() {
+	public boolean isFacingLeft()
+	{
 		return facingLeft;
 	}
 
-	public void setFacingLeft(boolean facingLeft) {
+	public void setFacingLeft(boolean facingLeft)
+	{
 		this.facingLeft = facingLeft;
 	}
 
 	// retourne toute la surface du monstre
-	public Rectangle getArea() {
+	public Rectangle getArea()
+	{
 		return new Rectangle(getX(), getY(), width, height);
 	}
 
 	// retourne la défence du monstre
-	public int getDefense() {
-		return (int)(def * statMultipliers[DEF] * allStatsMultiplier);
+	public int getDefense()
+	{
+		return (int) (def * statMultipliers[DEF] * allStatsMultiplier);
 	}
 
-	int getAtk(){
-		return (int)(atk * allStatsMultiplier * statMultipliers[DMG]);
+	int getAtk()
+	{
+		return (int) (atk * allStatsMultiplier * statMultipliers[DMG]);
 	}
-	
-	int getMastery(){
-		int mast = (int)(mastery * allStatsMultiplier * statMultipliers[DMG]);
-		if(mast >= 100) return 99;
+
+	int getMastery()
+	{
+		int mast = (int) (mastery * allStatsMultiplier * statMultipliers[DMG]);
+		if (mast >= 100) return 99;
 		return mast;
 	}
 
 	// fais tomber le monstre
-	public void fall(long timePassed) {
-		if (vy < 0.8f)
-			vy += 0.005f * timePassed;
+	public void fall(long timePassed)
+	{
+		if (vy < 0.8f) vy += 0.005f * timePassed;
 	}
 
 	// retourne la vitesse de base du monstre
-	public float getSpeed() {
-		return spd*allStatsMultiplier*statMultipliers[SPD];
+	public float getSpeed()
+	{
+		return spd * allStatsMultiplier * statMultipliers[SPD];
 	}
 
 	// retourne la base du monstre
-	public Rectangle getBase() {
-		return new Rectangle(getX() + 10, getY() + height - 15,
-				width - 20, 20);
+	public Rectangle getBase()
+	{
+		return new Rectangle(getX() + 10, getY() + height - 15, width - 20, 20);
 	}
 }

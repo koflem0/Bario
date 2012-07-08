@@ -1,83 +1,101 @@
 package com.pieno.jeu;
+
 import java.awt.Image;
 import java.util.*;
 
-public class Animation {
+public class Animation
+{
 
 	private ArrayList<OneScene> scenes;
 	private int sceneIndex;
 	private long movieTime, totalTime;
-	
 
-	public Animation() {
+	public Animation()
+	{
 		scenes = new ArrayList<OneScene>();
 		totalTime = 0;
 		start();
 	}
-	
-	public Animation(Animation a){
+
+	public Animation(Animation a)
+	{
 		scenes = a.scenes;
 		totalTime = a.totalTime;
 		start();
 	}
-	
-	//ajoute une image à l'animation
-	public synchronized void addScene(Image i, int t){
+
+	// ajoute une image à l'animation
+	public synchronized void addScene(Image i, int t)
+	{
 		totalTime += t;
 		scenes.add(new OneScene(i, totalTime));
 	}
-	
-	public long getTime(){
+
+	public long getTime()
+	{
 		return movieTime;
 	}
-	public long getTotalTime(){
+
+	public long getTotalTime()
+	{
 		return totalTime;
 	}
-	public void setTime(long time){
+
+	public void setTime(long time)
+	{
 		movieTime = time;
 		update();
 	}
-	
-	//recommence l'animation
-	public synchronized void start(){
+
+	// recommence l'animation
+	public synchronized void start()
+	{
 		movieTime = 0;
 		sceneIndex = 0;
 	}
-	
-	//change l'image selon le temps écoulé
-	public synchronized void update(long timePassed){
+
+	// change l'image selon le temps écoulé
+	public synchronized void update(long timePassed)
+	{
 		movieTime += timePassed;
-		if(movieTime >= totalTime) start();
-		while(movieTime > getScene(sceneIndex).endTime) sceneIndex++;
+		if (movieTime >= totalTime) start();
+		while (movieTime > getScene(sceneIndex).endTime)
+			sceneIndex++;
 	}
-	
-	public synchronized void update(){
-		if(movieTime >= totalTime) start();
-		while(movieTime > getScene(sceneIndex).endTime) sceneIndex++;
-	
+
+	public synchronized void update()
+	{
+		if (movieTime >= totalTime) start();
+		while (movieTime > getScene(sceneIndex).endTime)
+			sceneIndex++;
+
 	}
-	
-	//retourne l'image actuelle
-	public synchronized Image getImage() {
-		if(scenes.size()==0) return null;
+
+	// retourne l'image actuelle
+	public synchronized Image getImage()
+	{
+		if (scenes.size() == 0) return null;
 		else return getScene(sceneIndex).pic;
 	}
-	
-	
-	//retourne une scène (une image accompagnée d'un temps)
-	private OneScene getScene(int x){
-		return(OneScene)scenes.get(x);
+
+	// retourne une scène (une image accompagnée d'un temps)
+	private OneScene getScene(int x)
+	{
+		return (OneScene) scenes.get(x);
 	}
-	
-	//////////////classe interne, une scène est un objet composé d'une image et de son temps durant l'animation ////////////
-	private class OneScene{
+
+	// ////////////classe interne, une scène est un objet composé d'une image et
+	// de son temps durant l'animation ////////////
+	private class OneScene
+	{
 		Image pic;
 		long endTime;
-		
-		public OneScene(Image pic, long endTime){
+
+		public OneScene(Image pic, long endTime)
+		{
 			this.pic = pic;
 			this.endTime = endTime;
 		}
 	}
-	
+
 }
